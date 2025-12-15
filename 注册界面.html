@@ -145,8 +145,8 @@
         
         <form id="registerForm">
             <div class="form-group">
-                <label for="phone">手机号</label>
-                <input type="tel" id="phone" class="form-control" placeholder="请输入手机号" required>
+                <label for="phone">用户名</label>
+                <input type="tel" id="phone" class="form-control" placeholder="请输入用户名" required>
             </div>
             
             <div class="form-group">
@@ -181,11 +181,11 @@
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             
-            // 简单的手机号验证（11位数字）
-            if (!/^1[3-9]\d{9}$/.test(phone)) {
-                alert('请输入有效的手机号码');
-                return;
-            }
+            // // 简单的手机号验证（11位数字）
+            // if (!/^1[3-9]\d{9}$/.test(phone)) {
+            //     alert('请输入有效的手机号码');
+            //     return;
+            // }
             
             if (password !== confirmPassword) {
                 alert('两次输入的密码不一致！');
