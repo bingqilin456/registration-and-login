@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园食光 - 管理员登录</title>
+    <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #e6f7ff, #f8f9fa);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        /* 登录卡片样式 */
+        .login-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(24, 144, 255, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        /* Logo和标题 */
+        .logo {
+            font-size: 32px;
+            color: #1890FF;
+            margin-bottom: 15px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: #777;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .admin-tag {
+            display: inline-block;
+            background-color: #1890FF;
+            color: white;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #1890FF;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.2);
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #1890FF;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0c7cd5;
+        }
+        
+        /* 底部链接 */
+        .user-link {
+            margin-top: 25px;
+            font-size: 14px;
+        }
+        
+        .user-link a {
+            color: #FF6B35;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 20px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">🍽️</div>
+        <h1 class="title">校园食光</h1>
+        <p class="subtitle">食堂管理后台</p>
+        <div class="admin-tag">管理平台</div>
+        
+        <form id="adminLoginForm">
+            <div class="form-group">
+                <label for="adminId">管理员账号</label>
+                <input type="text" id="adminId" class="form-control" placeholder="请输入管理员账号" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" class="form-control" placeholder="请输入密码" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">管理员登录</button>
+        </form>
+        
+        <div class="user-link">
+            <a href="用户登录界面.html">返回普通用户登录</a>
+        </div>
+    </div>
+
+    <script>
+        // 管理员登录验证
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const adminId = document.getElementById('adminId').value;
+            const password = document.getElementById('password').value;
+            
+            // 简单验证
+            if (adminId.trim() === '') {
+                alert('请输入管理员账号');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('密码至少需要6位字符！');
+                return;
+            }
+            
+            // 模拟登录成功
+            alert('管理员登录成功！即将跳转到管理后台');
+            // window.location.href = 'admin-dashboard.html';
+        });
+    </script>
+</body>
+</html>
