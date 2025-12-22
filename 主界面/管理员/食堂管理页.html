@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园食光 - 食堂管理</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #e60012;
+            --bg-light: #f8f8f8;
+            --border-color: #e5e5e5;
+            --text-dark: #333;
+            --text-light: #999;
+            --success-color: #52c41a;
+            --warning-color: #ff4d4f;
+            --rating-color: #ffc107;
+            --tag-color: #1890ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        /* 导航栏 */
+        .admin-navbar {
+            background-color: var(--primary-color);
+            height: 45px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .admin-navbar .navbar-brand {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .admin-navbar .navbar-brand i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        .admin-navbar .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .admin-navbar .nav-link:hover {
+            color: white;
+        }
+        
+        .admin-navbar .nav-link.active {
+            color: #000 !important;
+            font-weight: 500;
+        }
+        
+        .admin-navbar .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #000;
+            opacity: 1;
+        }
+        
+        /* 主要内容区域 */
+        .admin-container {
+            margin-top: 45px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* 页面标题 */
+        .page-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .page-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        /* 卡片组件 */
+        .admin-card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 8px;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+        
+        /* 添加食堂按钮 */
+        .add-canteen-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .add-canteen-btn:hover {
+            background-color: #cc0010;
+        }
+        
+        .add-canteen-btn i {
+            margin-right: 6px;
+        }
+        
+        /* 食堂网格 */
+        .canteen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .canteen-card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .canteen-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .canteen-image {
+            height: 160px;
+            background-color: #f5f5f5;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .canteen-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .canteen-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-open {
+            background-color: rgba(82, 196, 26, 0.9);
+            color: white;
+        }
+        
+        .status-closed {
+            background-color: rgba(255, 77, 79, 0.9);
+            color: white;
+        }
+        
+        .canteen-info {
+            padding: 15px;
+        }
+        
+        .canteen-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+        
+        .canteen-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .meta-item i {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+        
+        .canteen-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .canteen-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 15px 15px 15px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            background-color: white;
+            font-size: 12px;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .action-btn i {
+            margin-right: 5px;
+        }
+        
+        /* 窗口管理 */
+        .window-management {
+            margin-top: 30px;
+        }
+        
+        .window-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .window-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .window-item:hover {
+            background-color: #fafafa;
+        }
+        
+        .window-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .window-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .window-details {
+            flex: 1;
+        }
+        
+        .window-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .window-specialty {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .window-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* 日历菜单视图 */
+        .calendar-view {
+            margin-top: 30px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .calendar-nav-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .calendar-nav-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .calendar-month {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .calendar-day {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+            min-height: 100px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .calendar-day:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .calendar-day.today {
+            background-color: rgba(230, 0, 18, 0.05);
+            border-color: var(--primary-color);
+        }
+        
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .day-number {
+            font-weight: bold;
+        }
+        
+        .day-of-week {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .menu-preview {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        /* 菜品管理 */
+        .dish-management {
+            margin-top: 30px;
+        }
+        
+        .dish-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .dish-table th {
+            background-color: #fafafa;
+            text-align: left;
+            padding: 12px 15px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+        
+        .dish-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        .dish-table tbody tr:hover {
+            background-color: #fafafa;
+        }
+        
+        .dish-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+        
+        .dish-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* 编辑表单模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            color: var(--primary-color);
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #cc0010;
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 15px;
+            }
+            
+            .canteen-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 5px;
+            }
+            
+            .calendar-day {
+                min-height: 80px;
+                padding: 5px;
+            }
+            
+            .menu-preview {
+                -webkit-line-clamp: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="admin-navbar navbar navbar-expand-lg">
+        <div class="container-fluid" style="max-width: 1200px; margin: 0 auto;">
+            <a class="navbar-brand" href="admin_home.html">
+                <i class="fas fa-utensils"></i>
+                校园食光 - 管理员后台
+            </a>
+            <div class="navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./管理员首页.html" data-page="首页"><i class="fas fa-home"></i> 首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./数据报表页.html" data-page="数据报表"><i class="fas fa-chart-line"></i> 数据报表</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./评论管理页.html" data-page="评论管理"><i class="fas fa-comments"></i> 评论管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="./食堂管理页.html" data-page="食堂管理"><i class="fas fa-store"></i> 食堂管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./内容发布页.html" data-page="内容发布"><i class="fas fa-bullhorn"></i> 内容发布</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <span class="navbar-text text-white me-3">
+                        <i class="fas fa-user-circle me-1"></i> 管理员: 张老师
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="admin-container">
+        <!-- 页面标题 -->
+        <div class="page-title">
+            <div>
+                <i class="fas fa-store"></i> 食堂管理
+            </div>
+            <button class="add-canteen-btn" onclick="openCanteenModal()">
+                <i class="fas fa-plus"></i> 添加食堂
+            </button>
+        </div>
+
+        <!-- 食堂网格 -->
+        <div class="canteen-grid">
+            <!-- 食堂卡片 1 -->
+            <div class="canteen-card">
+                <div class="canteen-image">
+                    <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="第一食堂">
+                    <div class="canteen-status status-open">营业中</div>
+                </div>
+                <div class="canteen-info">
+                    <div class="canteen-name">第一食堂</div>
+                    <div class="canteen-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>教学区A栋</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>07:00-21:00</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-utensils"></i>
+                            <span>8个窗口</span>
+                        </div>
+                    </div>
+                    <div class="canteen-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">4.7</div>
+                            <div class="stat-label">评分</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">856</div>
+                            <div class="stat-label">今日访问</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">菜品数</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="canteen-actions">
+                    <button class="action-btn" onclick="editCanteen('第一食堂')">
+                        <i class="fas fa-edit"></i> 编辑
+                    </button>
+                    <button class="action-btn" onclick="viewWindows('第一食堂')">
+                        <i class="fas fa-list"></i> 窗口
+                    </button>
+                    <button class="action-btn" onclick="viewMenu('第一食堂')">
+                        <i class="fas fa-utensils"></i> 菜单
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 食堂卡片 2 -->
+            <div class="canteen-card">
+                <div class="canteen-image">
+                    <img src="https://images.unsplash.com/photo-1559925393-8be0ec4767c8?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="第二食堂">
+                    <div class="canteen-status status-open">营业中</div>
+                </div>
+                <div class="canteen-info">
+                    <div class="canteen-name">第二食堂</div>
+                    <div class="canteen-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>生活区B栋</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>07:30-21:30</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-utensils"></i>
+                            <span>6个窗口</span>
+                        </div>
+                    </div>
+                    <div class="canteen-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">4.5</div>
+                            <div class="stat-label">评分</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">723</div>
+                            <div class="stat-label">今日访问</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">38</div>
+                            <div class="stat-label">菜品数</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="canteen-actions">
+                    <button class="action-btn" onclick="editCanteen('第二食堂')">
+                        <i class="fas fa-edit"></i> 编辑
+                    </button>
+                    <button class="action-btn" onclick="viewWindows('第二食堂')">
+                        <i class="fas fa-list"></i> 窗口
+                    </button>
+                    <button class="action-btn" onclick="viewMenu('第二食堂')">
+                        <i class="fas fa-utensils"></i> 菜单
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 食堂卡片 3 -->
+            <div class="canteen-card">
+                <div class="canteen-image">
+                    <img src="https://images.unsplash.com/photo-1554679665-f5537f187268?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" alt="第三食堂">
+                    <div class="canteen-status status-closed">已关闭</div>
+                </div>
+                <div class="canteen-info">
+                    <div class="canteen-name">第三食堂</div>
+                    <div class="canteen-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>实验楼C栋</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>暂停营业</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-utensils"></i>
+                            <span>4个窗口</span>
+                        </div>
+                    </div>
+                    <div class="canteen-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">4.3</div>
+                            <div class="stat-label">评分</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">今日访问</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">28</div>
+                            <div class="stat-label">菜品数</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="canteen-actions">
+                    <button class="action-btn" onclick="editCanteen('第三食堂')">
+                        <i class="fas fa-edit"></i> 编辑
+                    </button>
+                    <button class="action-btn" onclick="viewWindows('第三食堂')">
+                        <i class="fas fa-list"></i> 窗口
+                    </button>
+                    <button class="action-btn" onclick="viewMenu('第三食堂')">
+                        <i class="fas fa-utensils"></i> 菜单
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 窗口管理 -->
+        <div class="admin-card window-management">
+            <h3 class="card-title">
+                <i class="fas fa-list"></i> 窗口管理 - 第一食堂
+            </h3>
+            <ul class="window-list">
+                <li class="window-item">
+                    <div class="window-info">
+                        <div class="window-number">1</div>
+                        <div class="window-details">
+                            <div class="window-name">主食窗口</div>
+                            <div class="window-specialty">米饭、面条、馒头</div>
+                        </div>
+                    </div>
+                    <div class="window-actions">
+                        <button class="action-btn" onclick="editWindow(1)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </li>
+                <li class="window-item">
+                    <div class="window-info">
+                        <div class="window-number">2</div>
+                        <div class="window-details">
+                            <div class="window-name">炒菜窗口</div>
+                            <div class="window-specialty">川菜、湘菜、家常菜</div>
+                        </div>
+                    </div>
+                    <div class="window-actions">
+                        <button class="action-btn" onclick="editWindow(2)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </li>
+                <li class="window-item">
+                    <div class="window-info">
+                        <div class="window-number">3</div>
+                        <div class="window-details">
+                            <div class="window-name">面点窗口</div>
+                            <div class="window-specialty">牛肉炒粿、汤面、饺子</div>
+                        </div>
+                    </div>
+                    <div class="window-actions">
+                        <button class="action-btn" onclick="editWindow(3)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </li>
+                <li class="window-item">
+                    <div class="window-info">
+                        <div class="window-number">4</div>
+                        <div class="window-details">
+                            <div class="window-name">特色小吃</div>
+                            <div class="window-specialty">麻辣香锅、酸辣粉、煎饼</div>
+                        </div>
+                    </div>
+                    <div class="window-actions">
+                        <button class="action-btn" onclick="editWindow(4)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </li>
+            </ul>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="add-canteen-btn" onclick="addWindow()">
+                    <i class="fas fa-plus"></i> 添加窗口
+                </button>
+            </div>
+        </div>
+
+        <!-- 日历菜单视图 -->
+        <div class="admin-card calendar-view">
+            <h3 class="card-title">
+                <i class="fas fa-calendar-alt"></i> 菜单日历 - 第一食堂
+            </h3>
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" onclick="changeMonth(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="calendar-month">2024年12月</div>
+                    <button class="calendar-nav-btn" onclick="changeMonth(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <button class="add-canteen-btn" onclick="addDish()">
+                    <i class="fas fa-plus"></i> 添加菜品
+                </button>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <!-- 菜品管理 -->
+        <div class="admin-card dish-management">
+            <h3 class="card-title">
+                <i class="fas fa-utensils"></i> 菜品列表 - 第一食堂
+            </h3>
+            <div style="overflow-x: auto;">
+                <table class="dish-table">
+                    <thead>
+                        <tr>
+                            <th>菜品图片</th>
+                            <th>菜品名称</th>
+                            <th>所属窗口</th>
+                            <th>价格</th>
+                            <th>评分</th>
+                            <th>库存</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <img src="https://images.unsplash.com/photo-1563379091339-03246963d9d6?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" class="dish-image" alt="牛肉炒粿">
+                            </td>
+                            <td>牛肉炒粿</td>
+                            <td>面点窗口</td>
+                            <td>¥12.0</td>
+                            <td>4.8</td>
+                            <td>42</td>
+                            <td><span class="status-open" style="display: inline-block;">上架</span></td>
+                            <td>
+                                <div class="dish-actions">
+                                    <button class="action-btn" onclick="editDish('牛肉炒粿')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="https://images.unsplash.com/photo-1578683010236-d716f9a3f461?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" class="dish-image" alt="麻辣香锅">
+                            </td>
+                            <td>麻辣香锅</td>
+                            <td>特色小吃</td>
+                            <td>¥15.0</td>
+                            <td>4.5</td>
+                            <td>28</td>
+                            <td><span class="status-open" style="display: inline-block;">上架</span></td>
+                            <td>
+                                <div class="dish-actions">
+                                    <button class="action-btn" onclick="editDish('麻辣香锅')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" class="dish-image" alt="番茄鸡蛋面">
+                            </td>
+                            <td>番茄鸡蛋面</td>
+                            <td>面点窗口</td>
+                            <td>¥8.0</td>
+                            <td>4.6</td>
+                            <td>65</td>
+                            <td><span class="status-open" style="display: inline-block;">上架</span></td>
+                            <td>
+                                <div class="dish-actions">
+                                    <button class="action-btn" onclick="editDish('番茄鸡蛋面')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80" class="dish-image" alt="红烧肉">
+                            </td>
+                            <td>红烧肉</td>
+                            <td>炒菜窗口</td>
+                            <td>¥10.0</td>
+                            <td>4.7</td>
+                            <td>0</td>
+                            <td><span class="status-closed" style="display: inline-block;">售罄</span></td>
+                            <td>
+                                <div class="dish-actions">
+                                    <button class="action-btn" onclick="editDish('红烧肉')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 食堂编辑模态框 -->
+    <div class="modal-overlay" id="canteenModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">编辑食堂信息</div>
+                <button class="modal-close" onclick="closeCanteenModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">食堂名称</label>
+                    <input type="text" class="form-input" id="canteenName" value="第一食堂">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">食堂位置</label>
+                    <input type="text" class="form-input" id="canteenLocation" value="教学区A栋">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">营业时间</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="time" class="form-input" id="openTime" value="07:00">
+                        <span>至</span>
+                        <input type="time" class="form-input" id="closeTime" value="21:00">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">食堂状态</label>
+                    <select class="form-input" id="canteenStatus">
+                        <option value="open">营业中</option>
+                        <option value="closed">已关闭</option>
+                        <option value="maintenance">维护中</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">食堂描述</label>
+                    <textarea class="form-input" id="canteenDescription" rows="3">第一食堂位于教学区A栋，提供丰富的菜品选择，环境整洁，服务周到。</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">食堂图片</label>
+                    <input type="file" class="form-input" id="canteenImage">
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="closeCanteenModal()">取消</button>
+                    <button class="btn btn-primary" onclick="saveCanteen()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // 初始化日历
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCalendar(2024, 11); // 2024年12月
+        });
+        
+        // 生成日历
+        function generateCalendar(year, month) {
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            // 星期标题
+            const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+            daysOfWeek.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.style.textAlign = 'center';
+                dayHeader.style.padding = '10px 0';
+                dayHeader.style.fontWeight = 'bold';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+            
+            // 获取当月第一天是星期几
+            const firstDay = new Date(year, month, 1).getDay();
+            
+            // 获取当月的天数
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // 填充空白
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarGrid.appendChild(emptyDay);
+            }
+            
+            // 填充日期
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                if (isCurrentMonth && day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = day;
+                
+                const dayOfWeek = document.createElement('div');
+                dayOfWeek.className = 'day-of-week';
+                dayOfWeek.textContent = daysOfWeek[new Date(year, month, day).getDay()];
+                
+                dayHeader.appendChild(dayNumber);
+                dayHeader.appendChild(dayOfWeek);
+                
+                const menuPreview = document.createElement('div');
+                menuPreview.className = 'menu-preview';
+                
+                // 模拟菜单数据
+                if (day === 20) {
+                    menuPreview.textContent = '牛肉炒粿、麻辣香锅、番茄鸡蛋面';
+                } else if (day === 21) {
+                    menuPreview.textContent = '红烧肉、酸菜鱼、宫保鸡丁';
+                } else {
+                    menuPreview.textContent = '查看菜单';
+                }
+                
+                dayElement.appendChild(dayHeader);
+                dayElement.appendChild(menuPreview);
+                
+                // 点击日期查看菜单
+                dayElement.addEventListener('click', function() {
+                    alert(`查看${year}年${month + 1}月${day}日菜单`);
+                });
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+        
+        // 切换月份
+        let currentMonth = 11; // 12月
+        let currentYear = 2024;
+        
+        function changeMonth(direction) {
+            currentMonth += direction;
+            
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            
+            document.querySelector('.calendar-month').textContent = 
+                `${currentYear}年${currentMonth + 1}月`;
+            generateCalendar(currentYear, currentMonth);
+        }
+        
+        // 食堂编辑模态框
+        function openCanteenModal() {
+            document.getElementById('canteenModal').style.display = 'flex';
+        }
+        
+        function closeCanteenModal() {
+            document.getElementById('canteenModal').style.display = 'none';
+        }
+        
+        function saveCanteen() {
+            const name = document.getElementById('canteenName').value;
+            const location = document.getElementById('canteenLocation').value;
+            const openTime = document.getElementById('openTime').value;
+            const closeTime = document.getElementById('closeTime').value;
+            const status = document.getElementById('canteenStatus').value;
+            
+            alert(`保存成功！\n食堂名称：${name}\n位置：${location}\n营业时间：${openTime} - ${closeTime}\n状态：${status}`);
+            closeCanteenModal();
+        }
+        
+        // 食堂操作函数
+        function editCanteen(name) {
+            alert(`编辑食堂：${name}`);
+            openCanteenModal();
+        }
+        
+        function viewWindows(name) {
+            alert(`查看${name}的窗口管理`);
+        }
+        
+        function viewMenu(name) {
+            alert(`查看${name}的菜单管理`);
+        }
+        
+        function editWindow(number) {
+            alert(`编辑窗口：${number}号窗口`);
+        }
+        
+        function addWindow() {
+            alert('添加新窗口');
+        }
+        
+        function addDish() {
+            alert('添加新菜品');
+        }
+        
+        function editDish(name) {
+            alert(`编辑菜品：${name}`);
+        }
+    </script>
+    <script src="./navbar.js"></script>
+    <script>
+        setActiveNav('食堂管理');
+    </script>
+</body>
+</html>

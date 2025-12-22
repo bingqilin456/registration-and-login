@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园食光 - 数据报表</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ECharts 图表库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #e60012;
+            --bg-light: #f8f8f8;
+            --border-color: #e5e5e5;
+            --text-dark: #333;
+            --text-light: #999;
+            --success-color: #52c41a;
+            --warning-color: #ff4d4f;
+            --rating-color: #ffc107;
+            --tag-color: #1890ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        /* 导航栏 */
+        .admin-navbar {
+            background-color: var(--primary-color);
+            height: 45px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .admin-navbar .navbar-brand {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .admin-navbar .navbar-brand i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        .admin-navbar .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .admin-navbar .nav-link:hover {
+            color: white;
+        }
+        
+        .admin-navbar .nav-link.active {
+            color: #000 !important;
+            font-weight: 500;
+        }
+        
+        .admin-navbar .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #000;
+            opacity: 1;
+        }
+        
+        /* 主要内容区域 */
+        .admin-container {
+            margin-top: 45px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* 页面标题 */
+        .page-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .page-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        /* 卡片组件 */
+        .admin-card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 8px;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+        
+        /* 时间筛选器 */
+        .time-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .time-btn {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px 15px;
+            font-size: 14px;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .time-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .time-btn.active {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+        
+        .date-range {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+        
+        .date-input {
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-small {
+            height: 300px;
+        }
+        
+        /* 数据表格 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: #fafafa;
+            text-align: left;
+            padding: 12px 15px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #fafafa;
+        }
+        
+        .trend-up {
+            color: var(--success-color);
+            font-weight: 500;
+        }
+        
+        .trend-down {
+            color: var(--warning-color);
+            font-weight: 500;
+        }
+        
+        /* 对比卡片 */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .comparison-card {
+            background-color: white;
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .comparison-title {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+        
+        .comparison-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .comparison-change {
+            font-size: 13px;
+        }
+        
+        /* 热力图容器 */
+        .heatmap-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .heatmap-hour {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .heatmap-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        
+        .heatmap-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        /* 排名列表 */
+        .ranking-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+        
+        .ranking-rank {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .ranking-rank.top3 {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .ranking-info {
+            flex: 1;
+        }
+        
+        .ranking-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .ranking-meta {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 15px;
+            }
+            
+            .time-filter {
+                flex-direction: column;
+            }
+            
+            .date-range {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="admin-navbar navbar navbar-expand-lg">
+        <div class="container-fluid" style="max-width: 1200px; margin: 0 auto;">
+            <a class="navbar-brand" href="admin_home.html">
+                <i class="fas fa-utensils"></i>
+                校园食光 - 管理员后台
+            </a>
+            <div class="navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="./管理员首页.html" data-page="首页"><i class="fas fa-home"></i> 首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="./数据报表页.html" data-page="数据报表"><i class="fas fa-chart-line"></i> 数据报表</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./评论管理页.html" data-page="评论管理"><i class="fas fa-comments"></i> 评论管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./食堂管理页.html" data-page="食堂管理"><i class="fas fa-store"></i> 食堂管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./内容发布页.html" data-page="内容发布"><i class="fas fa-bullhorn"></i> 内容发布</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <span class="navbar-text text-white me-3">
+                        <i class="fas fa-user-circle me-1"></i> 管理员: 张老师
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="admin-container">
+        <!-- 页面标题和时间筛选 -->
+        <div class="page-title">
+            <div>
+                <i class="fas fa-chart-line"></i> 数据分析报表
+            </div>
+            <div class="time-filter">
+                <button class="time-btn active">今日</button>
+                <button class="time-btn">本周</button>
+                <button class="time-btn">本月</button>
+                <div class="date-range">
+                    <input type="date" class="date-input" value="2024-12-01">
+                    <span>至</span>
+                    <input type="date" class="date-input" value="2024-12-20">
+                    <button class="time-btn">查询</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 对比分析 -->
+        <div class="admin-card">
+            <h3 class="card-title">
+                <i class="fas fa-balance-scale"></i> 对比分析
+            </h3>
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <div class="comparison-title">总访问量</div>
+                    <div class="comparison-value">18,245</div>
+                    <div class="comparison-change">
+                        <span class="trend-up">↑ 12.5%</span> 较上周
+                    </div>
+                </div>
+                
+                <div class="comparison-card">
+                    <div class="comparison-title">总订单量</div>
+                    <div class="comparison-value">3,842</div>
+                    <div class="comparison-change">
+                        <span class="trend-up">↑ 8.3%</span> 较上周
+                    </div>
+                </div>
+                
+                <div class="comparison-card">
+                    <div class="comparison-title">用户满意度</div>
+                    <div class="comparison-value">4.6/5.0</div>
+                    <div class="comparison-change">
+                        <span class="trend-up">↑ 0.2</span> 较上周
+                    </div>
+                </div>
+                
+                <div class="comparison-card">
+                    <div class="comparison-title">平均客单价</div>
+                    <div class="comparison-value">¥18.5</div>
+                    <div class="comparison-change">
+                        <span class="trend-down">↓ 2.1%</span> 较上周
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 流量趋势图 -->
+        <div class="admin-card">
+            <h3 class="card-title">
+                <i class="fas fa-chart-area"></i> 访问量趋势
+            </h3>
+            <div class="chart-container" id="trafficChart"></div>
+        </div>
+
+        <!-- 食堂对比图 -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="admin-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-bar"></i> 各食堂数据对比
+                    </h3>
+                    <div class="chart-container" id="canteenChart"></div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="admin-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-award"></i> 菜品TOP10
+                    </h3>
+                    <ul class="ranking-list">
+                        <li class="ranking-item">
+                            <div class="ranking-rank top3">1</div>
+                            <div class="ranking-info">
+                                <div class="ranking-name">牛肉炒粿</div>
+                                <div class="ranking-meta">第一食堂 · 856次浏览</div>
+                            </div>
+                        </li>
+                        <li class="ranking-item">
+                            <div class="ranking-rank top3">2</div>
+                            <div class="ranking-info">
+                                <div class="ranking-name">麻辣香锅</div>
+                                <div class="ranking-meta">第二食堂 · 723次浏览</div>
+                            </div>
+                        </li>
+                        <li class="ranking-item">
+                            <div class="ranking-rank top3">3</div>
+                            <div class="ranking-info">
+                                <div class="ranking-name">番茄鸡蛋面</div>
+                                <div class="ranking-meta">第一食堂 · 689次浏览</div>
+                            </div>
+                        </li>
+                        <li class="ranking-item">
+                            <div class="ranking-rank">4</div>
+                            <div class="ranking-info">
+                                <div class="ranking-name">酸菜鱼</div>
+                                <div class="ranking-meta">第三食堂 · 587次浏览</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时段分析 -->
+        <div class="admin-card">
+            <h3 class="card-title">
+                <i class="fas fa-clock"></i> 24小时热力图分析
+            </h3>
+            <div class="heatmap-container" id="heatmap"></div>
+        </div>
+
+        <!-- 详细数据表格 -->
+        <div class="admin-card">
+            <h3 class="card-title">
+                <i class="fas fa-table"></i> 详细数据
+            </h3>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>食堂名称</th>
+                            <th>访问量</th>
+                            <th>订单量</th>
+                            <th>平均评分</th>
+                            <th>人均消费</th>
+                            <th>转化率</th>
+                            <th>趋势</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>第一食堂</td>
+                            <td>6,842</td>
+                            <td>1,452</td>
+                            <td>4.7</td>
+                            <td>¥16.8</td>
+                            <td>21.2%</td>
+                            <td class="trend-up">↑</td>
+                        </tr>
+                        <tr>
+                            <td>第二食堂</td>
+                            <td>5,432</td>
+                            <td>1,123</td>
+                            <td>4.5</td>
+                            <td>¥18.2</td>
+                            <td>20.7%</td>
+                            <td class="trend-up">↑</td>
+                        </tr>
+                        <tr>
+                            <td>第三食堂</td>
+                            <td>3,289</td>
+                            <td>689</td>
+                            <td>4.3</td>
+                            <td>¥15.5</td>
+                            <td>21.0%</td>
+                            <td class="trend-down">↓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // 时间筛选器交互
+        document.addEventListener('DOMContentLoaded', function() {
+            // 时间按钮点击事件
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                if (!btn.classList.contains('date-range')) {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                    });
+                }
+            });
+            
+            // 生成热力图数据
+            generateHeatmap();
+            
+            // 初始化图表
+            initTrafficChart();
+            initCanteenChart();
+        });
+        
+        // 初始化流量趋势图
+        function initTrafficChart() {
+            const chartDom = document.getElementById('trafficChart');
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                color: ['#e60012'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['12/01', '12/02', '12/03', '12/04', '12/05', '12/06', '12/07', 
+                           '12/08', '12/09', '12/10', '12/11', '12/12', '12/13', '12/14',
+                           '12/15', '12/16', '12/17', '12/18', '12/19', '12/20'],
+                    axisLabel: {
+                        color: '#666',
+                        fontSize: 12
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    name: '访问量',
+                    axisLabel: {
+                        color: '#666',
+                        fontSize: 12
+                    }
+                },
+                series: [
+                    {
+                        name: '访问量',
+                        type: 'line',
+                        smooth: true,
+                        data: [856, 789, 912, 845, 1023, 987, 865, 
+                               932, 1012, 1089, 1156, 1245, 1320, 1289,
+                               1356, 1423, 1389, 1456, 1523, 1568],
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [{
+                                    offset: 0, color: 'rgba(230, 0, 18, 0.3)'
+                                }, {
+                                    offset: 1, color: 'rgba(230, 0, 18, 0.05)'
+                                }]
+                            }
+                        }
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            // 响应式调整
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 初始化食堂对比图
+        function initCanteenChart() {
+            const chartDom = document.getElementById('canteenChart');
+            const myChart = echarts.init(chartDom);
+            
+            const option = {
+                color: ['#e60012', '#52c41a', '#1890ff', '#ffc107', '#722ed1'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['访问量', '订单量', '平均评分'],
+                    top: 10
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    top: '15%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['第一食堂', '第二食堂', '第三食堂'],
+                    axisLabel: {
+                        color: '#666',
+                        fontSize: 12
+                    }
+                },
+                yAxis: [
+                    {
+                        type: 'value',
+                        name: '访问量/订单量',
+                        position: 'left',
+                        axisLabel: {
+                            color: '#666',
+                            fontSize: 12
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '评分',
+                        position: 'right',
+                        min: 0,
+                        max: 5,
+                        axisLabel: {
+                            color: '#666',
+                            fontSize: 12,
+                            formatter: '{value}'
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '访问量',
+                        type: 'bar',
+                        data: [6842, 5432, 3289, 2682, 1524]
+                    },
+                    {
+                        name: '订单量',
+                        type: 'bar',
+                        data: [1452, 1123, 689, 578, 312]
+                    },
+                    {
+                        name: '平均评分',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: [4.7, 4.5, 4.3, 4.8, 4.6]
+                    }
+                ]
+            };
+            
+            myChart.setOption(option);
+            
+            // 响应式调整
+            window.addEventListener('resize', function() {
+                myChart.resize();
+            });
+        }
+        
+        // 生成热力图数据
+        function generateHeatmap() {
+            const heatmapContainer = document.getElementById('heatmap');
+            const hours = [
+                '00:00-01:00', '01:00-02:00', '02:00-03:00', '03:00-04:00',
+                '04:00-05:00', '05:00-06:00', '06:00-07:00', '07:00-08:00',
+                '08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00',
+                '12:00-13:00', '13:00-14:00', '14:00-15:00', '15:00-16:00',
+                '16:00-17:00', '17:00-18:00', '18:00-19:00', '19:00-20:00',
+                '20:00-21:00', '21:00-22:00', '22:00-23:00', '23:00-24:00'
+            ];
+            
+            // 模拟数据：高峰时段有更高的访问量
+            const values = [12, 8, 5, 4, 3, 15, 89, 156, 210, 185, 167, 423, 
+                           856, 789, 345, 234, 289, 567, 689, 456, 289, 156, 89, 45];
+            
+            // 生成热力图方块
+            hours.forEach((hour, index) => {
+                const value = values[index];
+                let bgColor = '#f5f5f5';
+                
+                // 根据访问量设置颜色
+                if (value > 500) {
+                    bgColor = '#ff4d4f';
+                } else if (value > 200) {
+                    bgColor = '#ff7a45';
+                } else if (value > 100) {
+                    bgColor = '#ffc107';
+                } else if (value > 50) {
+                    bgColor = '#73d13d';
+                } else {
+                    bgColor = '#f5f5f5';
+                }
+                
+                const heatmapHour = document.createElement('div');
+                heatmapHour.className = 'heatmap-hour';
+                heatmapHour.style.backgroundColor = bgColor;
+                heatmapHour.innerHTML = `
+                    <div class="heatmap-label">${hour}</div>
+                    <div class="heatmap-value">${value}</div>
+                `;
+                
+                heatmapContainer.appendChild(heatmapHour);
+            });
+        }
+    </script>
+    <script src="./navbar.js"></script>
+    <script>
+        setActiveNav('数据报表');
+    </script>
+</body>
+</html>

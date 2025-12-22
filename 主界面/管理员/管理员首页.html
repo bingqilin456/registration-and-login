@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园食光 - 管理员后台</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 全局样式 - 遵循大众点评风格规范 */
+        :root {
+            --primary-color: #e60012; /* 大众点评红 */
+            --bg-light: #f8f8f8;
+            --border-color: #e5e5e5;
+            --text-dark: #333;
+            --text-light: #999;
+            --success-color: #52c41a;
+            --warning-color: #ff4d4f;
+            --rating-color: #ffc107;
+            --tag-color: #1890ff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        /* 导航栏 */
+        .admin-navbar {
+            background-color: var(--primary-color);
+            height: 45px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .admin-navbar .navbar-brand {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .admin-navbar .navbar-brand i {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        .admin-navbar .nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .admin-navbar .nav-link:hover {
+            color: white;
+        }
+        
+        .admin-navbar .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: white;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        .admin-navbar .nav-link.active {
+            color: #000 !important;
+            font-weight: 500;
+        }
+
+        .admin-navbar .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #000;
+            opacity: 1;
+        }
+        
+        /* 主要内容区域 */
+        .admin-container {
+            margin-top: 45px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* 页面标题 */
+        .page-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .page-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        /* 卡片组件 */
+        .admin-card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 8px;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+        
+        /* 数据统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .stat-icon.visitors {
+            background-color: rgba(230, 0, 18, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .stat-icon.comments {
+            background-color: rgba(82, 196, 26, 0.1);
+            color: var(--success-color);
+        }
+        
+        .stat-icon.popular {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--rating-color);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        /* 快捷操作按钮 */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .action-btn {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+        
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .action-btn .btn-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* 待处理事项列表 */
+        .task-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .task-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: rgba(255, 77, 79, 0.1);
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 12px;
+        }
+        
+        .task-content {
+            flex: 1;
+        }
+        
+        .task-title {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+        
+        .task-subtitle {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .task-action {
+            font-size: 12px;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        /* 食堂列表 */
+        .canteen-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .canteen-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .canteen-item:last-child {
+            border-bottom: none;
+        }
+        
+        .canteen-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .canteen-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(230, 0, 18, 0.1);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        
+        .canteen-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .canteen-status {
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin-left: 10px;
+        }
+        
+        .canteen-status.open {
+            background-color: rgba(82, 196, 26, 0.1);
+            color: var(--success-color);
+        }
+        
+        .canteen-status.closed {
+            background-color: rgba(255, 77, 79, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .edit-btn {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            padding: 5px 12px;
+            font-size: 12px;
+            color: var(--text-light);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .edit-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        /* 退出登录按钮 */
+        .logout-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            padding: 8px 20px;
+            font-size: 14px;
+            color: var(--text-light);
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logout-btn:hover {
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+        }
+        
+        .logout-btn i {
+            margin-right: 5px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="admin-navbar navbar navbar-expand-lg">
+        <div class="container-fluid" style="max-width: 1200px; margin: 0 auto;">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-utensils"></i>
+                校园食光 - 管理员后台
+            </a>
+            <div class="navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="./管理员首页.html" data-page="首页"><i class="fas fa-home"></i> 首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./数据报表页.html" data-page="数据报表"><i class="fas fa-chart-line"></i> 数据报表</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./评论管理页.html" data-page="评论管理"><i class="fas fa-comments"></i> 评论管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./食堂管理页.html" data-page="食堂管理"><i class="fas fa-store"></i> 食堂管理</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./内容发布页.html" data-page="内容发布"><i class="fas fa-bullhorn"></i> 内容发布</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <span class="navbar-text text-white me-3">
+                        <i class="fas fa-user-circle me-1"></i> 管理员: 张老师
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <div class="admin-container">
+        <!-- 页面标题 -->
+        <h1 class="page-title">
+            <i class="fas fa-tachometer-alt"></i> 管理员控制台
+        </h1>
+
+        <!-- 今日数据统计 -->
+        <div class="admin-card">
+            <h3 class="card-title">
+                <i class="fas fa-chart-bar"></i> 今日数据概览
+            </h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon visitors">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">1,245</div>
+                    <div class="stat-label">今日访问人数</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon comments">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <div class="stat-value">86</div>
+                    <div class="stat-label">新增评论数量</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon popular">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-value">42</div>
+                    <div class="stat-label">扫码点餐次数</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon visitors">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">热门菜品TOP3</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快捷操作 -->
+        <div class="admin-card">
+            <h3 class="card-title">
+                <i class="fas fa-bolt"></i> 快捷操作入口
+            </h3>
+            <div class="quick-actions">
+                <a href="#" class="action-btn">
+                    <i class="fas fa-qrcode"></i>
+                    <span class="btn-text">扫码快速录入</span>
+                </a>
+                
+                <a href="#" class="action-btn">
+                    <i class="fas fa-file-excel"></i>
+                    <span class="btn-text">Excel批量导入</span>
+                </a>
+                
+                <a href="#" class="action-btn">
+                    <i class="fas fa-edit"></i>
+                    <span class="btn-text">批量编辑操作</span>
+                </a>
+                
+                <a href="#" class="action-btn">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="btn-text">智能排期助手</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- 左侧：待处理事项 -->
+            <div class="col-md-6">
+                <div class="admin-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-tasks"></i> 待处理事项
+                    </h3>
+                    <ul class="task-list">
+                        <li class="task-item">
+                            <div class="task-icon">
+                                <i class="fas fa-exclamation"></i>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">3条新评论需要审核</div>
+                                <div class="task-subtitle">包含1条负面评价需要优先处理</div>
+                            </div>
+                            <div class="task-action">去处理</div>
+                        </li>
+                        
+                        <li class="task-item">
+                            <div class="task-icon">
+                                <i class="fas fa-exclamation"></i>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">第一食堂3号窗口需更新菜单</div>
+                                <div class="task-subtitle">菜品库存不足，需要及时补充</div>
+                            </div>
+                            <div class="task-action">去处理</div>
+                        </li>
+                        
+                        <li class="task-item">
+                            <div class="task-icon">
+                                <i class="fas fa-exclamation"></i>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">2个食堂营业时间需要调整</div>
+                                <div class="task-subtitle">根据假期安排更新营业时间</div>
+                            </div>
+                            <div class="task-action">去处理</div>
+                        </li>
+                        
+                        <li class="task-item">
+                            <div class="task-icon">
+                                <i class="fas fa-exclamation"></i>
+                            </div>
+                            <div class="task-content">
+                                <div class="task-title">价格异常提醒：牛肉炒粿</div>
+                                <div class="task-subtitle">检测到价格波动超出正常范围</div>
+                            </div>
+                            <div class="task-action">去处理</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 右侧：食堂列表 -->
+            <div class="col-md-6">
+                <div class="admin-card">
+                    <h3 class="card-title">
+                        <i class="fas fa-store-alt"></i> 食堂列表管理
+                    </h3>
+                    <ul class="canteen-list">
+                        <li class="canteen-item">
+                            <div class="canteen-info">
+                                <div class="canteen-icon">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="canteen-name">第一食堂</div>
+                                <div class="canteen-status open">营业中</div>
+                            </div>
+                            <button class="edit-btn">编辑</button>
+                        </li>
+                        
+                        <li class="canteen-item">
+                            <div class="canteen-info">
+                                <div class="canteen-icon">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="canteen-name">第二食堂</div>
+                                <div class="canteen-status open">营业中</div>
+                            </div>
+                            <button class="edit-btn">编辑</button>
+                        </li>
+                        
+                        <li class="canteen-item">
+                            <div class="canteen-info">
+                                <div class="canteen-icon">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <div class="canteen-name">第三食堂</div>
+                                <div class="canteen-status closed">已关闭</div>
+                            </div>
+                            <button class="edit-btn">编辑</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 退出登录 -->
+        <div class="logout-section">
+            <button class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> 退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // 简单的交互功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 编辑按钮点击事件
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const canteenName = this.closest('.canteen-item').querySelector('.canteen-name').textContent;
+                    alert(`即将编辑 ${canteenName} 的信息`);
+                });
+            });
+            
+            // 任务操作点击事件
+            document.querySelectorAll('.task-action').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const taskTitle = this.closest('.task-item').querySelector('.task-title').textContent;
+                    alert(`处理任务: ${taskTitle}`);
+                });
+            });
+            
+            // 快捷操作按钮点击事件
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const btnText = this.querySelector('.btn-text').textContent;
+                    alert(`执行操作: ${btnText}`);
+                });
+            });
+            
+            // 退出登录按钮点击事件
+            document.querySelector('.logout-btn').addEventListener('click', function() {
+                if (confirm('确定要退出登录吗？')) {
+                    alert('已退出登录，正在跳转到登录页面...');
+                    // 实际应用中这里应该跳转到登录页面
+                }
+            });
+        });
+    </script>
+    <script src="./navbar.js"></script>
+    <script>
+        setActiveNav('首页');
+    </script>
+</body>
+</html>
