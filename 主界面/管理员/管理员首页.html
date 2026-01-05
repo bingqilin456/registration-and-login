@@ -3,42 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>校园食光 - 管理员后台</title>
+    <title>管理员后台 - 校园食光</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 图标 -->
+    <!-- 字体图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* 全局样式 - 遵循大众点评风格规范 */
+        /* 全局样式 - 与首页完全一致 */
         :root {
-            --primary-color: #e60012; /* 大众点评红 */
-            --bg-light: #f8f8f8;
+            --primary-color: #e60012;
+            --bg-gray: #f8f8f8;
             --border-color: #e5e5e5;
             --text-dark: #333;
             --text-light: #999;
-            --success-color: #52c41a;
-            --warning-color: #ff4d4f;
+            --status-open: #52c41a;
+            --status-closed: #ff4d4f;
             --rating-color: #ffc107;
-            --tag-color: #1890ff;
+            --tag-blue: #1890ff;
+            --spacing-small: 8px;
+            --spacing-medium: 15px;
+            --spacing-large: 20px;
+            --border-radius: 4px;
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
         }
         
         body {
-            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--bg-light);
+            background-color: var(--bg-gray);
             color: var(--text-dark);
             line-height: 1.5;
+            font-size: 14px;
         }
         
-        /* 导航栏 */
-        .admin-navbar {
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-large);
+        }
+        
+        /* 顶部导航栏 - 与首页一致 */
+        .global-nav {
             background-color: var(--primary-color);
             height: 45px;
             position: fixed;
@@ -46,76 +66,119 @@
             left: 0;
             right: 0;
             z-index: 1000;
+            color: white;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
         }
         
-        .admin-navbar .navbar-brand {
-            color: white;
-            font-size: 18px;
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-large);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
             font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        .nav-right {
             display: flex;
             align-items: center;
         }
         
-        .admin-navbar .navbar-brand i {
-            margin-right: 8px;
-            font-size: 20px;
-        }
-        
-        .admin-navbar .nav-link {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            transition: all 0.3s;
+        .nav-item {
+            margin-left: 20px;
+            font-size: 13px;
+            cursor: pointer;
             position: relative;
+            padding: 5px 0;
         }
         
-        .admin-navbar .nav-link:hover {
-            color: white;
+        .nav-item:hover {
+            opacity: 0.9;
         }
         
-        .admin-navbar .nav-link:hover::after {
+        .nav-item.active::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: 0;
             left: 0;
             right: 0;
             height: 2px;
             background-color: white;
-            opacity: 1;
-            transition: opacity 0.3s;
         }
-
-        .admin-navbar .nav-link.active {
-            color: #000 !important;
+        
+        /* 主导航 - 与首页一致 */
+        .main-nav {
+            background-color: white;
+            height: 50px;
+            margin-top: 45px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 45px;
+            z-index: 999;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--text-dark);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .nav-tab:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .nav-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
             font-weight: 500;
         }
-
-        .admin-navbar .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background-color: #000;
-            opacity: 1;
+        
+        .nav-tab i {
+            margin-right: 5px;
+            font-size: 14px;
         }
         
         /* 主要内容区域 */
-        .admin-container {
-            margin-top: 45px;
-            padding: 20px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+        .admin-main {
+            padding: var(--spacing-large) 0 60px;
         }
         
         /* 页面标题 */
+        .page-header {
+            margin-bottom: var(--spacing-large);
+        }
+        
         .page-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--text-dark);
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
         }
@@ -125,64 +188,52 @@
             color: var(--primary-color);
         }
         
-        /* 卡片组件 */
-        .admin-card {
-            background-color: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        
-        .admin-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-        }
-        
-        .card-title i {
-            margin-right: 8px;
-            color: var(--primary-color);
+        .page-subtitle {
+            color: var(--text-light);
             font-size: 14px;
         }
         
-        /* 数据统计卡片 */
+        /* 数据概览 */
+        .stats-section {
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: var(--spacing-medium);
+            font-weight: 500;
+        }
+        
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: var(--spacing-medium);
         }
         
         .stat-card {
             background-color: white;
-            border-radius: 4px;
-            padding: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: var(--spacing-medium);
             display: flex;
-            flex-direction: column;
             align-items: center;
-            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
         }
         
         .stat-icon {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 10px;
-            font-size: 18px;
+            margin-right: 15px;
+            font-size: 20px;
         }
         
         .stat-icon.visitors {
@@ -192,18 +243,27 @@
         
         .stat-icon.comments {
             background-color: rgba(82, 196, 26, 0.1);
-            color: var(--success-color);
+            color: var(--status-open);
         }
         
-        .stat-icon.popular {
+        .stat-icon.orders {
             background-color: rgba(255, 193, 7, 0.1);
             color: var(--rating-color);
+        }
+        
+        .stat-icon.dishes {
+            background-color: rgba(24, 144, 255, 0.1);
+            color: var(--tag-blue);
+        }
+        
+        .stat-info {
+            flex: 1;
         }
         
         .stat-value {
             font-size: 24px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
         .stat-label {
@@ -211,58 +271,107 @@
             color: var(--text-light);
         }
         
-        /* 快捷操作按钮 */
+        /* 快捷操作 */
         .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: var(--spacing-large);
         }
         
-        .action-btn {
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: var(--spacing-medium);
+        }
+        
+        .action-card {
             background-color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 20px 10px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: var(--spacing-medium);
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             transition: all 0.3s;
             cursor: pointer;
-            text-decoration: none;
-            color: var(--text-dark);
+            border: 1px solid transparent;
         }
         
-        .action-btn:hover {
+        .action-card:hover {
             border-color: var(--primary-color);
-            color: var(--primary-color);
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-hover);
         }
         
-        .action-btn i {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: var(--primary-color);
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-bottom: 12px;
+            font-size: 16px;
         }
         
-        .action-btn .btn-text {
+        .action-title {
             font-size: 14px;
             font-weight: 500;
         }
         
-        /* 待处理事项列表 */
-        .task-list {
-            list-style: none;
-            padding-left: 0;
+        /* 任务和食堂管理 */
+        .admin-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-large);
+            margin-bottom: var(--spacing-large);
         }
         
-        .task-item {
-            padding: 10px 0;
+        .admin-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .card-header {
+            padding: var(--spacing-medium);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
+        }
+        
+        .card-header i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .card-body {
+            padding: var(--spacing-medium);
+        }
+        
+        /* 任务列表 */
+        .task-list {
+            list-style: none;
+        }
+        
+        .task-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
         }
         
         .task-item:last-child {
@@ -274,12 +383,13 @@
             height: 24px;
             border-radius: 50%;
             background-color: rgba(255, 77, 79, 0.1);
-            color: var(--warning-color);
+            color: var(--status-closed);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 10px;
+            margin-right: 12px;
             font-size: 12px;
+            flex-shrink: 0;
         }
         
         .task-content {
@@ -288,11 +398,17 @@
         
         .task-title {
             font-size: 14px;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
         
-        .task-subtitle {
+        .task-desc {
             font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+        }
+        
+        .task-time {
+            font-size: 11px;
             color: var(--text-light);
         }
         
@@ -300,20 +416,17 @@
             font-size: 12px;
             color: var(--primary-color);
             cursor: pointer;
+            flex-shrink: 0;
+            align-self: center;
         }
         
         /* 食堂列表 */
-        .canteen-list {
-            list-style: none;
-            padding-left: 0;
-        }
-        
         .canteen-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
         }
         
         .canteen-item:last-child {
@@ -326,15 +439,15 @@
         }
         
         .canteen-icon {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background-color: rgba(230, 0, 18, 0.1);
             color: var(--primary-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 10px;
+            margin-right: 12px;
         }
         
         .canteen-name {
@@ -342,21 +455,21 @@
             font-weight: 500;
         }
         
-        .canteen-status {
+        .status-tag {
             font-size: 12px;
             padding: 3px 8px;
             border-radius: 3px;
             margin-left: 10px;
         }
         
-        .canteen-status.open {
+        .status-open {
             background-color: rgba(82, 196, 26, 0.1);
-            color: var(--success-color);
+            color: var(--status-open);
         }
         
-        .canteen-status.closed {
+        .status-closed {
             background-color: rgba(255, 77, 79, 0.1);
-            color: var(--warning-color);
+            color: var(--status-closed);
         }
         
         .edit-btn {
@@ -366,8 +479,8 @@
             padding: 5px 12px;
             font-size: 12px;
             color: var(--text-light);
-            transition: all 0.3s;
             cursor: pointer;
+            transition: all 0.3s;
         }
         
         .edit-btn:hover {
@@ -375,12 +488,12 @@
             color: var(--primary-color);
         }
         
-        /* 退出登录按钮 */
+        /* 退出登录 */
         .logout-section {
             display: flex;
             justify-content: flex-end;
-            margin-top: 30px;
-            padding-top: 20px;
+            margin-top: 40px;
+            padding-top: var(--spacing-medium);
             border-top: 1px solid var(--border-color);
         }
         
@@ -391,15 +504,15 @@
             padding: 8px 20px;
             font-size: 14px;
             color: var(--text-light);
-            transition: all 0.3s;
             cursor: pointer;
             display: flex;
             align-items: center;
+            transition: all 0.3s;
         }
         
         .logout-btn:hover {
-            border-color: var(--warning-color);
-            color: var(--warning-color);
+            border-color: var(--status-closed);
+            color: var(--status-closed);
         }
         
         .logout-btn i {
@@ -408,137 +521,170 @@
         
         /* 响应式调整 */
         @media (max-width: 768px) {
-            .admin-container {
-                padding: 15px;
+            .container {
+                padding: 0 var(--spacing-medium);
             }
             
             .stats-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
             }
             
-            .quick-actions {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            .actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .admin-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                overflow-x: auto;
+            }
+            
+            .nav-tab {
+                flex: 0 0 auto;
+                padding: 0 15px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
     <!-- 顶部导航栏 -->
-    <nav class="admin-navbar navbar navbar-expand-lg">
-        <div class="container-fluid" style="max-width: 1200px; margin: 0 auto;">
-            <a class="navbar-brand" href="#">
+    <nav class="global-nav">
+        <div class="nav-container">
+            <div class="logo">
                 <i class="fas fa-utensils"></i>
-                校园食光 - 管理员后台
-            </a>
-            <div class="navbar-collapse">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="./管理员首页.html" data-page="首页"><i class="fas fa-home"></i> 首页</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./数据报表页.html" data-page="数据报表"><i class="fas fa-chart-line"></i> 数据报表</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./评论管理页.html" data-page="评论管理"><i class="fas fa-comments"></i> 评论管理</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./食堂管理页.html" data-page="食堂管理"><i class="fas fa-store"></i> 食堂管理</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./内容发布页.html" data-page="内容发布"><i class="fas fa-bullhorn"></i> 内容发布</a>
-                    </li>
-                </ul>
-                <div class="d-flex">
-                    <span class="navbar-text text-white me-3">
-                        <i class="fas fa-user-circle me-1"></i> 管理员: 张老师
-                    </span>
+                校园食光 - 后台管理
+            </div>
+            <div class="nav-right">
+                <div class="nav-item">
+                    <i class="fas fa-user-circle me-1"></i> 管理员: 张老师
                 </div>
             </div>
         </div>
     </nav>
-
-    <!-- 主要内容区域 -->
-    <div class="admin-container">
+    
+    <!-- 主导航 -->
+    <nav class="main-nav">
+        <div class="nav-tabs">
+            <a class="nav-tab active" href="./管理员首页.html">
+                <i class="fas fa-tachometer-alt"></i> 控制台
+            </a>
+            <a class="nav-tab" href="./数据报表页.html">
+                <i class="fas fa-chart-line"></i> 数据报表
+            </a>
+            <a class="nav-tab" href="./评论管理页.html">
+                <i class="fas fa-comments"></i> 评论管理
+            </a>
+            <a class="nav-tab" href="./食堂管理页.html">
+                <i class="fas fa-store"></i> 食堂管理
+            </a>
+            <a class="nav-tab" href="./内容发布页.html">
+                <i class="fas fa-bullhorn"></i> 内容发布
+            </a>
+        </div>
+    </nav>
+    
+    <!-- 主要内容 -->
+    <main class="container admin-main">
         <!-- 页面标题 -->
-        <h1 class="page-title">
-            <i class="fas fa-tachometer-alt"></i> 管理员控制台
-        </h1>
-
-        <!-- 今日数据统计 -->
-        <div class="admin-card">
-            <h3 class="card-title">
-                <i class="fas fa-chart-bar"></i> 今日数据概览
-            </h3>
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-tachometer-alt"></i> 管理员控制台
+            </h1>
+            <p class="page-subtitle">实时监控平台数据，快速处理管理任务</p>
+        </div>
+        
+        <!-- 数据概览 -->
+        <section class="stats-section">
+            <h2 class="section-title">今日数据概览</h2>
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-icon visitors">
                         <i class="fas fa-users"></i>
                     </div>
-                    <div class="stat-value">1,245</div>
-                    <div class="stat-label">今日访问人数</div>
+                    <div class="stat-info">
+                        <div class="stat-value">1,245</div>
+                        <div class="stat-label">今日访问人数</div>
+                    </div>
                 </div>
                 
                 <div class="stat-card">
                     <div class="stat-icon comments">
                         <i class="fas fa-comment-dots"></i>
                     </div>
-                    <div class="stat-value">86</div>
-                    <div class="stat-label">新增评论数量</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon popular">
-                        <i class="fas fa-fire"></i>
+                    <div class="stat-info">
+                        <div class="stat-value">86</div>
+                        <div class="stat-label">新增评论数量</div>
                     </div>
-                    <div class="stat-value">42</div>
-                    <div class="stat-label">扫码点餐次数</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon visitors">
+                    <div class="stat-icon orders">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">扫码点餐次数</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon dishes">
                         <i class="fas fa-utensils"></i>
                     </div>
-                    <div class="stat-value">3</div>
-                    <div class="stat-label">热门菜品TOP3</div>
+                    <div class="stat-info">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">热门菜品TOP3</div>
+                    </div>
                 </div>
             </div>
-        </div>
-
+        </section>
+        
         <!-- 快捷操作 -->
-        <div class="admin-card">
-            <h3 class="card-title">
-                <i class="fas fa-bolt"></i> 快捷操作入口
-            </h3>
-            <div class="quick-actions">
-                <a href="#" class="action-btn">
-                    <i class="fas fa-qrcode"></i>
-                    <span class="btn-text">扫码快速录入</span>
-                </a>
+        <section class="quick-actions">
+            <h2 class="section-title">快捷操作入口</h2>
+            <div class="actions-grid">
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div class="action-title">扫码快速录入</div>
+                </div>
                 
-                <a href="#" class="action-btn">
-                    <i class="fas fa-file-excel"></i>
-                    <span class="btn-text">Excel批量导入</span>
-                </a>
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div class="action-title">Excel批量导入</div>
+                </div>
                 
-                <a href="#" class="action-btn">
-                    <i class="fas fa-edit"></i>
-                    <span class="btn-text">批量编辑操作</span>
-                </a>
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="action-title">批量编辑操作</div>
+                </div>
                 
-                <a href="#" class="action-btn">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span class="btn-text">智能排期助手</span>
-                </a>
+                <div class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="action-title">智能排期助手</div>
+                </div>
             </div>
-        </div>
-
-        <div class="row">
-            <!-- 左侧：待处理事项 -->
-            <div class="col-md-6">
-                <div class="admin-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-tasks"></i> 待处理事项
-                    </h3>
+        </section>
+        
+        <!-- 任务和食堂管理 -->
+        <div class="admin-content">
+            <!-- 待处理事项 -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <i class="fas fa-tasks"></i>
+                    <div class="card-title">待处理事项</div>
+                </div>
+                <div class="card-body">
                     <ul class="task-list">
                         <li class="task-item">
                             <div class="task-icon">
@@ -546,7 +692,8 @@
                             </div>
                             <div class="task-content">
                                 <div class="task-title">3条新评论需要审核</div>
-                                <div class="task-subtitle">包含1条负面评价需要优先处理</div>
+                                <div class="task-desc">包含1条负面评价需要优先处理</div>
+                                <div class="task-time">10分钟前</div>
                             </div>
                             <div class="task-action">去处理</div>
                         </li>
@@ -557,7 +704,8 @@
                             </div>
                             <div class="task-content">
                                 <div class="task-title">第一食堂3号窗口需更新菜单</div>
-                                <div class="task-subtitle">菜品库存不足，需要及时补充</div>
+                                <div class="task-desc">菜品库存不足，需要及时补充</div>
+                                <div class="task-time">30分钟前</div>
                             </div>
                             <div class="task-action">去处理</div>
                         </li>
@@ -568,7 +716,8 @@
                             </div>
                             <div class="task-content">
                                 <div class="task-title">2个食堂营业时间需要调整</div>
-                                <div class="task-subtitle">根据假期安排更新营业时间</div>
+                                <div class="task-desc">根据假期安排更新营业时间</div>
+                                <div class="task-time">1小时前</div>
                             </div>
                             <div class="task-action">去处理</div>
                         </li>
@@ -579,68 +728,67 @@
                             </div>
                             <div class="task-content">
                                 <div class="task-title">价格异常提醒：牛肉炒粿</div>
-                                <div class="task-subtitle">检测到价格波动超出正常范围</div>
+                                <div class="task-desc">检测到价格波动超出正常范围</div>
+                                <div class="task-time">2小时前</div>
                             </div>
                             <div class="task-action">去处理</div>
                         </li>
                     </ul>
                 </div>
             </div>
-
-            <!-- 右侧：食堂列表 -->
-            <div class="col-md-6">
-                <div class="admin-card">
-                    <h3 class="card-title">
-                        <i class="fas fa-store-alt"></i> 食堂列表管理
-                    </h3>
-                    <ul class="canteen-list">
-                        <li class="canteen-item">
+            
+            <!-- 食堂列表 -->
+            <div class="admin-card">
+                <div class="card-header">
+                    <i class="fas fa-store-alt"></i>
+                    <div class="card-title">食堂列表管理</div>
+                </div>
+                <div class="card-body">
+                    <div class="canteen-list">
+                        <div class="canteen-item">
                             <div class="canteen-info">
                                 <div class="canteen-icon">
                                     <i class="fas fa-utensils"></i>
                                 </div>
                                 <div class="canteen-name">第一食堂</div>
-                                <div class="canteen-status open">营业中</div>
+                                <span class="status-tag status-open">营业中</span>
                             </div>
                             <button class="edit-btn">编辑</button>
-                        </li>
+                        </div>
                         
-                        <li class="canteen-item">
+                        <div class="canteen-item">
                             <div class="canteen-info">
                                 <div class="canteen-icon">
                                     <i class="fas fa-utensils"></i>
                                 </div>
                                 <div class="canteen-name">第二食堂</div>
-                                <div class="canteen-status open">营业中</div>
+                                <span class="status-tag status-open">营业中</span>
                             </div>
                             <button class="edit-btn">编辑</button>
-                        </li>
+                        </div>
                         
-                        <li class="canteen-item">
+                        <div class="canteen-item">
                             <div class="canteen-info">
                                 <div class="canteen-icon">
                                     <i class="fas fa-utensils"></i>
                                 </div>
                                 <div class="canteen-name">第三食堂</div>
-                                <div class="canteen-status closed">已关闭</div>
+                                <span class="status-tag status-closed">已关闭</span>
                             </div>
                             <button class="edit-btn">编辑</button>
-                        </li>
-                    </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
+        
         <!-- 退出登录 -->
         <div class="logout-section">
             <button class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i> 退出登录
             </button>
         </div>
-    </div>
-
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </main>
     
     <script>
         // 简单的交互功能
@@ -661,12 +809,11 @@
                 });
             });
             
-            // 快捷操作按钮点击事件
-            document.querySelectorAll('.action-btn').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const btnText = this.querySelector('.btn-text').textContent;
-                    alert(`执行操作: ${btnText}`);
+            // 快捷操作卡片点击事件
+            document.querySelectorAll('.action-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const actionTitle = this.querySelector('.action-title').textContent;
+                    alert(`执行操作: ${actionTitle}`);
                 });
             });
             
@@ -677,11 +824,17 @@
                     // 实际应用中这里应该跳转到登录页面
                 }
             });
+            
+            // 导航激活状态
+            const currentPage = '控制台';
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.textContent.includes(currentPage)) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
         });
-    </script>
-    <script src="./navbar.js"></script>
-    <script>
-        setActiveNav('首页');
     </script>
 </body>
 </html>

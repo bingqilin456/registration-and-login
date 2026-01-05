@@ -948,7 +948,54 @@
         .discount-time i, .ranking-score i {
             margin-right: 5px;
         }
-        
+        /* 添加在CSS的最后，第1390行附近 */
+
+        /* 库存状态样式 */
+        .stock-info {
+            margin-bottom: 8px;
+        }
+
+        .stock-mode-limited {
+            color: #ff4d4f;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #f5f5f5;
+            border-radius: 3px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar .progress {
+            height: 100%;
+            background-color: #ff4d4f;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .stock-mode-unlimited {
+            color: #999;
+            font-size: 12px;
+            padding: 3px 8px;
+            background-color: #f5f5f5;
+            border-radius: 3px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .stock-mode-soldout {
+            color: #ff4d4f;
+            font-size: 12px;
+            padding: 3px 8px;
+            background-color: rgba(255, 77, 79, 0.1);
+            border-radius: 3px;
+            display: inline-block;
+            font-weight: 500;
+        }
         /* 时间标签 */
         .time-tag {
             background-color: #fff7e6;
@@ -1183,13 +1230,23 @@
                 <i class="fas fa-thumbs-up"></i> 智能推荐
             </h2>
             
-            <div class="recommend-wrapper">
                 <!-- 推荐菜品1 -->
                 <div class="recommend-card">
                     <div class="recommend-img">烧鸭饭图片</div>
                     <div class="recommend-info">
                         <h3 class="recommend-title">第一食堂烧鸭饭<span class="campus-tag">松山湖</span></h3>
                         <p class="recommend-desc">皮脆肉嫩，秘制酱汁，搭配青菜和米饭</p>
+                        
+                        <!-- 新增：库存状态显示 - 添加在第417行 -->
+                        <div class="stock-info">
+                            <div class="stock-mode-limited">
+                                <span>剩余 18 份</span>
+                                <div class="progress-bar">
+                                    <div class="progress" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="recommend-meta">
                             <div>
                                 <span class="recommend-rating"><i class="fas fa-star"></i> 4.7</span>
@@ -1404,6 +1461,12 @@
                     <div class="recommend-info">
                         <h3 class="recommend-title">莞城食堂鲜虾肠粉<span class="campus-tag">莞城校区</span></h3>
                         <p class="recommend-desc">现蒸肠粉，鲜虾嫩滑，酱油鲜美</p>
+                        
+                        <!-- 新增：库存状态显示 - 添加在第657行 -->
+                        <div class="stock-info">
+                            <div class="stock-mode-unlimited">在售</div>
+                        </div>
+                        
                         <div class="recommend-meta">
                             <div>
                                 <span class="recommend-rating"><i class="fas fa-star"></i> 4.8</span>
@@ -1420,6 +1483,11 @@
                     <div class="recommend-info">
                         <h3 class="recommend-title">第一食堂牛肉面<span class="campus-tag">松山湖</span></h3>
                         <p class="recommend-desc">汤头浓郁，牛肉大块，手工面条</p>
+
+                        <div class="stock-info">
+                            <div class="stock-mode-unlimited">在售</div>
+                        </div>
+
                         <div class="recommend-meta">
                             <div>
                                 <span class="recommend-rating"><i class="fas fa-star"></i> 4.5</span>
@@ -1436,6 +1504,10 @@
                     <div class="recommend-info">
                         <h3 class="recommend-title">第三食堂红豆沙<span class="campus-tag">松山湖</span></h3>
                         <p class="recommend-desc">传统广式糖水，红豆绵密，甜度适中</p>
+                        <div class="stock-info">
+                            <div class="stock-mode-unlimited">在售</div>
+                        </div>
+
                         <div class="recommend-meta">
                             <div>
                                 <span class="recommend-rating"><i class="fas fa-star"></i> 4.9</span>

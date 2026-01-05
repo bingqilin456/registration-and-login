@@ -3,41 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>校园食光 - 评论管理</title>
+    <title>评论管理 - 校园食光</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome 图标 -->
+    <!-- 字体图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* 全局样式 - 与首页完全一致 */
         :root {
             --primary-color: #e60012;
-            --bg-light: #f8f8f8;
+            --bg-gray: #f8f8f8;
             --border-color: #e5e5e5;
             --text-dark: #333;
             --text-light: #999;
-            --success-color: #52c41a;
-            --warning-color: #ff4d4f;
+            --status-open: #52c41a;
+            --status-closed: #ff4d4f;
             --rating-color: #ffc107;
-            --tag-color: #1890ff;
+            --tag-blue: #1890ff;
+            --spacing-small: 8px;
+            --spacing-medium: 15px;
+            --spacing-large: 20px;
+            --border-radius: 4px;
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
         }
         
         body {
-            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--bg-light);
+            background-color: var(--bg-gray);
             color: var(--text-dark);
             line-height: 1.5;
+            font-size: 14px;
         }
         
-        /* 导航栏 */
-        .admin-navbar {
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-large);
+        }
+        
+        /* 顶部导航栏 - 与首页一致 */
+        .global-nav {
             background-color: var(--primary-color);
             height: 45px;
             position: fixed;
@@ -45,67 +66,126 @@
             left: 0;
             right: 0;
             z-index: 1000;
+            color: white;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
         }
         
-        .admin-navbar .navbar-brand {
-            color: white;
-            font-size: 18px;
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-large);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
             font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        .nav-right {
             display: flex;
             align-items: center;
         }
         
-        .admin-navbar .navbar-brand i {
-            margin-right: 8px;
-            font-size: 20px;
-        }
-        
-        .admin-navbar .nav-link {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            transition: all 0.3s;
+        .nav-item {
+            margin-left: 20px;
+            font-size: 13px;
+            cursor: pointer;
             position: relative;
+            padding: 5px 0;
         }
         
-        .admin-navbar .nav-link:hover {
-            color: white;
+        .nav-item:hover {
+            opacity: 0.9;
         }
         
-        .admin-navbar .nav-link.active {
-            color: #000 !important;
-            font-weight: 500;
-        }
-        
-        .admin-navbar .nav-link.active::after {
+        .nav-item.active::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: 0;
             left: 0;
             right: 0;
             height: 2px;
-            background-color: #000;
-            opacity: 1;
+            background-color: white;
+        }
+        
+        /* 主导航 - 与首页一致 */
+        .main-nav {
+            background-color: white;
+            height: 50px;
+            margin-top: 45px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 45px;
+            z-index: 999;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--text-dark);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .nav-tab:hover {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .nav-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-tab i {
+            margin-right: 5px;
+            font-size: 14px;
         }
         
         /* 主要内容区域 */
-        .admin-container {
-            margin-top: 45px;
-            padding: 20px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+        .comment-main {
+            padding: var(--spacing-large) 0 60px;
         }
         
         /* 页面标题 */
+        .page-header {
+            margin-bottom: var(--spacing-large);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: var(--spacing-medium);
+        }
+        
         .page-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--text-dark);
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
         }
         
         .page-title i {
@@ -113,78 +193,149 @@
             color: var(--primary-color);
         }
         
-        /* 卡片组件 */
-        .admin-card {
-            background-color: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
+        .page-subtitle {
+            color: var(--text-light);
+            font-size: 14px;
         }
         
-        .admin-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        /* 预警区域 */
+        .alert-card {
+            background-color: #fff2f0;
+            border-left: 4px solid var(--status-closed);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            margin-bottom: var(--spacing-large);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         
-        .card-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            color: var(--text-dark);
+        .alert-header {
             display: flex;
             align-items: center;
         }
         
-        .card-title i {
-            margin-right: 8px;
-            color: var(--primary-color);
+        .alert-icon {
+            color: var(--status-closed);
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        
+        .alert-title {
+            font-weight: 500;
+            font-size: 15px;
+        }
+        
+        .alert-content {
             font-size: 14px;
+            color: var(--text-dark);
         }
         
-        /* 评论筛选器 */
-        .filter-bar {
+        .alert-link {
+            font-size: 13px;
+            color: var(--primary-color);
+            cursor: pointer;
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px;
         }
         
-        .filter-btn {
+        /* 批量操作栏 */
+        .batch-bar {
             background-color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            margin-bottom: var(--spacing-large);
+            box-shadow: var(--shadow-card);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .batch-select {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .batch-select input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .batch-select label {
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .batch-btn {
             padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: white;
             font-size: 14px;
             color: var(--text-dark);
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .filter-btn:hover {
+        .batch-btn:hover {
             border-color: var(--primary-color);
             color: var(--primary-color);
         }
         
-        .filter-btn.active {
+        /* 筛选器 */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: var(--spacing-large);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: white;
+            font-size: 14px;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-tab:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .filter-tab.active {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
             color: white;
         }
         
         .search-box {
-            flex: 1;
-            max-width: 300px;
             position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
         }
         
         .search-input {
             width: 100%;
             padding: 8px 15px 8px 35px;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             font-size: 14px;
+            background-color: white;
         }
         
         .search-icon {
@@ -193,38 +344,51 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-light);
+            font-size: 14px;
         }
         
-        /* 评论列表 */
-        .comment-list {
-            list-style: none;
-            padding-left: 0;
+        /* 评论卡片 */
+        .comment-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: var(--spacing-medium);
+            margin-bottom: var(--spacing-medium);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 4px solid transparent;
         }
         
-        .comment-item {
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
-            transition: all 0.3s;
+        .comment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
         }
         
-        .comment-item:hover {
-            background-color: #fafafa;
+        .comment-card.unread {
+            border-left-color: var(--status-closed);
+            background-color: #fffaf8;
         }
         
-        .comment-item.unread {
-            background-color: #fff2f0;
+        .comment-card.negative {
+            border-left-color: var(--status-closed);
+        }
+        
+        .comment-card.positive {
+            border-left-color: var(--status-open);
         }
         
         .comment-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .user-info {
             display: flex;
             align-items: center;
+            gap: 10px;
         }
         
         .user-avatar {
@@ -235,7 +399,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 10px;
             color: var(--primary-color);
         }
         
@@ -261,7 +424,7 @@
         }
         
         .comment-content {
-            margin: 10px 0;
+            margin: 12px 0;
             font-size: 14px;
             line-height: 1.6;
         }
@@ -269,14 +432,15 @@
         .comment-meta {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
         }
         
         .canteen-tag {
             background-color: #f0f9ff;
-            color: var(--tag-color);
-            padding: 3px 8px;
+            color: var(--tag-blue);
+            padding: 4px 8px;
             border-radius: 3px;
             font-size: 12px;
         }
@@ -286,32 +450,33 @@
             font-size: 14px;
         }
         
-        .sentiment {
-            padding: 3px 8px;
+        .sentiment-tag {
+            padding: 4px 8px;
             border-radius: 3px;
             font-size: 12px;
             font-weight: 500;
         }
         
-        .sentiment.positive {
+        .sentiment-positive {
             background-color: rgba(82, 196, 26, 0.1);
-            color: var(--success-color);
+            color: var(--status-open);
         }
         
-        .sentiment.negative {
+        .sentiment-negative {
             background-color: rgba(255, 77, 79, 0.1);
-            color: var(--warning-color);
+            color: var(--status-closed);
         }
         
-        .sentiment.neutral {
+        .sentiment-neutral {
             background-color: #f5f5f5;
             color: var(--text-light);
         }
         
+        /* 操作按钮 */
         .comment-actions {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            flex-wrap: wrap;
         }
         
         .action-btn {
@@ -319,10 +484,13 @@
             border: 1px solid var(--border-color);
             border-radius: 3px;
             background-color: white;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-dark);
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .action-btn:hover {
@@ -331,87 +499,15 @@
         }
         
         .action-btn.approve {
-            background-color: var(--success-color);
-            border-color: var(--success-color);
+            background-color: var(--status-open);
+            border-color: var(--status-open);
             color: white;
         }
         
         .action-btn.reject {
-            background-color: var(--warning-color);
-            border-color: var(--warning-color);
+            background-color: var(--status-closed);
+            border-color: var(--status-closed);
             color: white;
-        }
-        
-        /* 批量操作栏 */
-        .batch-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
-            background-color: white;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .batch-select {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .batch-btn {
-            padding: 8px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background-color: white;
-            font-size: 14px;
-            color: var(--text-dark);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .batch-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-        
-        /* 预警监控 */
-        .alert-section {
-            background-color: #fff2f0;
-            border-left: 4px solid var(--warning-color);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        
-        .alert-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .alert-icon {
-            color: var(--warning-color);
-            margin-right: 10px;
-            font-size: 16px;
-        }
-        
-        .alert-title {
-            font-weight: 500;
-            font-size: 14px;
-        }
-        
-        .alert-content {
-            font-size: 13px;
-            color: var(--text-dark);
-            margin-bottom: 10px;
-        }
-        
-        .alert-link {
-            font-size: 12px;
-            color: var(--primary-color);
-            cursor: pointer;
         }
         
         /* 分页器 */
@@ -420,6 +516,7 @@
             justify-content: center;
             gap: 5px;
             margin-top: 30px;
+            flex-wrap: wrap;
         }
         
         .page-btn {
@@ -429,7 +526,7 @@
             align-items: center;
             justify-content: center;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: var(--border-radius);
             background-color: white;
             cursor: pointer;
             transition: all 0.3s;
@@ -447,89 +544,128 @@
         }
         
         /* 响应式调整 */
-        @media (max-width: 768px) {
-            .admin-container {
-                padding: 15px;
-            }
-            
+        @media (max-width: 992px) {
             .filter-bar {
                 flex-direction: column;
+                align-items: flex-start;
             }
             
             .search-box {
                 max-width: 100%;
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--spacing-medium);
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
             
             .comment-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
             }
             
             .comment-meta {
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: flex-start;
             }
             
             .comment-actions {
-                flex-wrap: wrap;
+                width: 100%;
+            }
+            
+            .action-btn {
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .batch-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .batch-select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .nav-tabs {
+                overflow-x: auto;
+            }
+            
+            .nav-tab {
+                flex: 0 0 auto;
+                padding: 0 15px;
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
     <!-- 顶部导航栏 -->
-    <nav class="admin-navbar navbar navbar-expand-lg">
-        <div class="container-fluid" style="max-width: 1200px; margin: 0 auto;">
-            <a class="navbar-brand" href="admin_home.html">
+    <nav class="global-nav">
+        <div class="nav-container">
+            <div class="logo">
                 <i class="fas fa-utensils"></i>
-                校园食光 - 管理员后台
-            </a>
-            <div class="navbar-collapse">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="./管理员首页.html" data-page="首页"><i class="fas fa-home"></i> 首页</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./数据报表页.html" data-page="数据报表"><i class="fas fa-chart-line"></i> 数据报表</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="./评论管理页.html" data-page="评论管理"><i class="fas fa-comments"></i> 评论管理</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./食堂管理页.html" data-page="食堂管理"><i class="fas fa-store"></i> 食堂管理</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./内容发布页.html" data-page="内容发布"><i class="fas fa-bullhorn"></i> 内容发布</a>
-                    </li>
-                </ul>
-                <div class="d-flex">
-                    <span class="navbar-text text-white me-3">
-                        <i class="fas fa-user-circle me-1"></i> 管理员: 张老师
-                    </span>
+                校园食光 - 后台管理
+            </div>
+            <div class="nav-right">
+                <div class="nav-item">
+                    <i class="fas fa-user-circle me-1"></i> 管理员: 张老师
                 </div>
             </div>
         </div>
     </nav>
-
-    <!-- 主要内容区域 -->
-    <div class="admin-container">
+    
+    <!-- 主导航 -->
+    <nav class="main-nav">
+        <div class="nav-tabs">
+            <a class="nav-tab" href="./管理员首页.html">
+                <i class="fas fa-tachometer-alt"></i> 控制台
+            </a>
+            <a class="nav-tab" href="./数据报表页.html">
+                <i class="fas fa-chart-line"></i> 数据报表
+            </a>
+            <a class="nav-tab active" href="./评论管理页.html">
+                <i class="fas fa-comments"></i> 评论管理
+            </a>
+            <a class="nav-tab" href="./食堂管理页.html">
+                <i class="fas fa-store"></i> 食堂管理
+            </a>
+            <a class="nav-tab" href="./内容发布页.html">
+                <i class="fas fa-bullhorn"></i> 内容发布
+            </a>
+        </div>
+    </nav>
+    
+    <!-- 主要内容 -->
+    <main class="container comment-main">
         <!-- 页面标题 -->
-        <div class="page-title">
+        <div class="page-header">
             <div>
-                <i class="fas fa-comments"></i> 口碑管理
+                <h1 class="page-title">
+                    <i class="fas fa-comments"></i> 口碑管理
+                </h1>
+                <p class="page-subtitle">管理用户评论，维护平台口碑</p>
             </div>
-            <div class="d-flex align-items-center">
-                <span class="me-3 text-danger">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span style="color: var(--status-closed); font-weight: 500;">
                     <i class="fas fa-exclamation-triangle"></i> 3条预警评论
                 </span>
-                <button class="filter-btn">
+                <button class="batch-btn">
                     <i class="fas fa-sliders-h"></i> 更多筛选
                 </button>
             </div>
         </div>
-
+        
         <!-- 预警监控 -->
-        <div class="alert-section">
+        <div class="alert-card">
             <div class="alert-header">
                 <i class="fas fa-exclamation-circle alert-icon"></i>
                 <div class="alert-title">AI实时监控预警</div>
@@ -537,281 +673,324 @@
             <div class="alert-content">
                 检测到3条敏感关键词评论需要紧急处理："卫生差"、"服务态度恶劣"、"食物不新鲜"
             </div>
-            <div class="alert-link">
+            <div class="alert-link" id="alertLink">
                 <i class="fas fa-link"></i> 点击自动定位到相关评论
             </div>
         </div>
-
+        
         <!-- 批量操作栏 -->
-        <div class="batch-actions">
+        <div class="batch-bar">
             <div class="batch-select">
                 <input type="checkbox" id="selectAll">
                 <label for="selectAll">全选</label>
             </div>
-            <button class="batch-btn">批量通过</button>
-            <button class="batch-btn">批量隐藏</button>
-            <button class="batch-btn">批量删除</button>
-            <button class="batch-btn">导出选中</button>
+            <button class="batch-btn" id="batchApprove">批量通过</button>
+            <button class="batch-btn" id="batchHide">批量隐藏</button>
+            <button class="batch-btn" id="batchDelete">批量删除</button>
+            <button class="batch-btn" id="batchExport">导出选中</button>
         </div>
-
+        
         <!-- 评论筛选器 -->
         <div class="filter-bar">
-            <button class="filter-btn active">全部评论 (86)</button>
-            <button class="filter-btn">待审核 (12)</button>
-            <button class="filter-btn">已通过 (68)</button>
-            <button class="filter-btn">已隐藏 (6)</button>
-            <button class="filter-btn">负面评价 (8)</button>
+            <div class="filter-tabs">
+                <button class="filter-tab active">全部评论 (86)</button>
+                <button class="filter-tab">待审核 (12)</button>
+                <button class="filter-tab">已通过 (68)</button>
+                <button class="filter-tab">已隐藏 (6)</button>
+                <button class="filter-tab">负面评价 (8)</button>
+            </div>
             <div class="search-box">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" class="search-input" placeholder="搜索评论内容...">
             </div>
         </div>
-
+        
         <!-- 评论列表 -->
-        <div class="admin-card">
-            <h3 class="card-title">
-                <i class="fas fa-list"></i> 评论列表
-            </h3>
+        <div>
+            <!-- 评论项 1 -->
+            <div class="comment-card unread positive">
+                <div class="comment-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">张同学</div>
+                            <div class="user-tag">计算机学院 · 大二</div>
+                        </div>
+                    </div>
+                    <div class="comment-time">2024-12-20 18:32</div>
+                </div>
+                
+                <div class="comment-content">
+                    第一食堂的牛肉炒粿真的很棒！味道正宗，分量也足，强烈推荐！就是有时候排队的人有点多，希望可以增加窗口。
+                </div>
+                
+                <div class="comment-meta">
+                    <span class="canteen-tag">第一食堂</span>
+                    <span class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </span>
+                    <span class="sentiment-tag sentiment-positive">正面评价</span>
+                </div>
+                
+                <div class="comment-actions">
+                    <button class="action-btn approve" data-action="approve">
+                        <i class="fas fa-check"></i> 通过
+                    </button>
+                    <button class="action-btn" data-action="hide">
+                        <i class="fas fa-eye-slash"></i> 隐藏
+                    </button>
+                    <button class="action-btn" data-action="reply">
+                        <i class="fas fa-reply"></i> 回复
+                    </button>
+                </div>
+            </div>
             
-            <ul class="comment-list">
-                <!-- 评论项 1 -->
-                <li class="comment-item unread">
-                    <div class="comment-header">
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="user-details">
-                                <div class="user-name">张同学</div>
-                                <div class="user-tag">计算机学院 · 大二</div>
-                            </div>
+            <!-- 评论项 2 -->
+            <div class="comment-card unread negative">
+                <div class="comment-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <div class="comment-time">2024-12-20 18:32</div>
+                        <div class="user-details">
+                            <div class="user-name">李同学</div>
+                            <div class="user-tag">经管学院 · 大三</div>
+                        </div>
                     </div>
-                    
-                    <div class="comment-content">
-                        第一食堂的牛肉炒粿真的很棒！味道正宗，分量也足，强烈推荐！就是有时候排队的人有点多，希望可以增加窗口。
-                    </div>
-                    
-                    <div class="comment-meta">
-                        <span class="canteen-tag">第一食堂</span>
-                        <span class="rating-stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </span>
-                        <span class="sentiment positive">正面评价</span>
-                    </div>
-                    
-                    <div class="comment-actions">
-                        <button class="action-btn approve">通过</button>
-                        <button class="action-btn">隐藏</button>
-                        <button class="action-btn">回复</button>
-                    </div>
-                </li>
+                    <div class="comment-time">2024-12-20 15:45</div>
+                </div>
                 
-                <!-- 评论项 2 -->
-                <li class="comment-item unread">
-                    <div class="comment-header">
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="user-details">
-                                <div class="user-name">李同学</div>
-                                <div class="user-tag">经管学院 · 大三</div>
-                            </div>
-                        </div>
-                        <div class="comment-time">2024-12-20 15:45</div>
-                    </div>
-                    
-                    <div class="comment-content">
-                        第二食堂今天中午的麻辣香锅太咸了，而且有点油腻。希望厨师能注意一下调味，上次来吃的时候味道挺好的。
-                    </div>
-                    
-                    <div class="comment-meta">
-                        <span class="canteen-tag">第二食堂</span>
-                        <span class="rating-stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </span>
-                        <span class="sentiment negative">负面评价</span>
-                    </div>
-                    
-                    <div class="comment-actions">
-                        <button class="action-btn approve">通过</button>
-                        <button class="action-btn reject">隐藏</button>
-                        <button class="action-btn">回复</button>
-                    </div>
-                </li>
+                <div class="comment-content">
+                    第二食堂今天中午的麻辣香锅太咸了，而且有点油腻。希望厨师能注意一下调味，上次来吃的时候味道挺好的。
+                </div>
                 
-                <!-- 评论项 3 -->
-                <li class="comment-item unread">
-                    <div class="comment-header">
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="user-details">
-                                <div class="user-name">王同学</div>
-                                <div class="user-tag">外国语学院 · 大一</div>
-                            </div>
-                        </div>
-                        <div class="comment-time">2024-12-20 12:18</div>
-                    </div>
-                    
-                    <div class="comment-content">
-                        卫生条件太差了！今天在第三食堂吃饭，桌子上还有油渍没擦干净，餐具也不是很干净。希望能改善卫生状况！
-                    </div>
-                    
-                    <div class="comment-meta">
-                        <span class="canteen-tag">第三食堂</span>
-                        <span class="rating-stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </span>
-                        <span class="sentiment negative">负面评价</span>
-                    </div>
-                    
-                    <div class="comment-actions">
-                        <button class="action-btn">通过</button>
-                        <button class="action-btn reject">隐藏</button>
-                        <button class="action-btn">回复</button>
-                    </div>
-                </li>
+                <div class="comment-meta">
+                    <span class="canteen-tag">第二食堂</span>
+                    <span class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </span>
+                    <span class="sentiment-tag sentiment-negative">负面评价</span>
+                </div>
                 
-                <!-- 评论项 4 -->
-                <li class="comment-item">
-                    <div class="comment-header">
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="user-details">
-                                <div class="user-name">赵老师</div>
-                                <div class="user-tag">教职工</div>
-                            </div>
-                        </div>
-                        <div class="comment-time">2024-12-19 19:25</div>
-                    </div>
-                    
-                    <div class="comment-content">
-                        第三餐厅的环境不错，菜品也比较丰富。就是价格稍微有点高，对于学生来说可能不太友好。建议可以推出一些优惠套餐。
-                    </div>
-                    
-                    <div class="comment-meta">
-                        <span class="canteen-tag">第三餐厅</span>
-                        <span class="rating-stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="far fa-star"></i>
-                        </span>
-                        <span class="sentiment neutral">中性评价</span>
-                    </div>
-                    
-                    <div class="comment-actions">
-                        <button class="action-btn approve">通过</button>
-                        <button class="action-btn">隐藏</button>
-                        <button class="action-btn">回复</button>
-                    </div>
-                </li>
-                
-                <!-- 评论项 5 -->
-                <li class="comment-item">
-                    <div class="comment-header">
-                        <div class="user-info">
-                            <div class="user-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="user-details">
-                                <div class="user-name">孙同学</div>
-                                <div class="user-tag">教育学院 · 大四</div>
-                            </div>
-                        </div>
-                        <div class="comment-time">2024-12-19 17:42</div>
-                    </div>
-                    
-                    <div class="comment-content">
-                        一饭一楼的面很好吃，牛肉很新鲜。服务员态度也很好，就是菜品种类有点少，希望能增加一些新的菜品。
-                    </div>
-                    
-                    <div class="comment-meta">
-                        <span class="canteen-tag">第一食堂</span>
-                        <span class="rating-stars">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </span>
-                        <span class="sentiment positive">正面评价</span>
-                    </div>
-                    
-                    <div class="comment-actions">
-                        <button class="action-btn approve">通过</button>
-                        <button class="action-btn">隐藏</button>
-                        <button class="action-btn">回复</button>
-                    </div>
-                </li>
-            </ul>
+                <div class="comment-actions">
+                    <button class="action-btn approve" data-action="approve">
+                        <i class="fas fa-check"></i> 通过
+                    </button>
+                    <button class="action-btn reject" data-action="reject">
+                        <i class="fas fa-eye-slash"></i> 隐藏
+                    </button>
+                    <button class="action-btn" data-action="reply">
+                        <i class="fas fa-reply"></i> 回复
+                    </button>
+                </div>
+            </div>
             
-            <!-- 分页器 -->
-            <div class="pagination">
-                <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-                <button class="page-btn">4</button>
-                <button class="page-btn">5</button>
-                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            <!-- 评论项 3 -->
+            <div class="comment-card unread negative">
+                <div class="comment-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">王同学</div>
+                            <div class="user-tag">外国语学院 · 大一</div>
+                        </div>
+                    </div>
+                    <div class="comment-time">2024-12-20 12:18</div>
+                </div>
+                
+                <div class="comment-content">
+                    卫生条件太差了！今天在第三食堂吃饭，桌子上还有油渍没擦干净，餐具也不是很干净。希望能改善卫生状况！
+                </div>
+                
+                <div class="comment-meta">
+                    <span class="canteen-tag">第三食堂</span>
+                    <span class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </span>
+                    <span class="sentiment-tag sentiment-negative">负面评价</span>
+                </div>
+                
+                <div class="comment-actions">
+                    <button class="action-btn" data-action="approve">
+                        <i class="fas fa-check"></i> 通过
+                    </button>
+                    <button class="action-btn reject" data-action="reject">
+                        <i class="fas fa-eye-slash"></i> 隐藏
+                    </button>
+                    <button class="action-btn" data-action="reply">
+                        <i class="fas fa-reply"></i> 回复
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 评论项 4 -->
+            <div class="comment-card">
+                <div class="comment-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">赵老师</div>
+                            <div class="user-tag">教职工</div>
+                        </div>
+                    </div>
+                    <div class="comment-time">2024-12-19 19:25</div>
+                </div>
+                
+                <div class="comment-content">
+                    第三餐厅的环境不错，菜品也比较丰富。就是价格稍微有点高，对于学生来说可能不太友好。建议可以推出一些优惠套餐。
+                </div>
+                
+                <div class="comment-meta">
+                    <span class="canteen-tag">第三餐厅</span>
+                    <span class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </span>
+                    <span class="sentiment-tag sentiment-neutral">中性评价</span>
+                </div>
+                
+                <div class="comment-actions">
+                    <button class="action-btn approve" data-action="approve">
+                        <i class="fas fa-check"></i> 通过
+                    </button>
+                    <button class="action-btn" data-action="hide">
+                        <i class="fas fa-eye-slash"></i> 隐藏
+                    </button>
+                    <button class="action-btn" data-action="reply">
+                        <i class="fas fa-reply"></i> 回复
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 评论项 5 -->
+            <div class="comment-card">
+                <div class="comment-header">
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">孙同学</div>
+                            <div class="user-tag">教育学院 · 大四</div>
+                        </div>
+                    </div>
+                    <div class="comment-time">2024-12-19 17:42</div>
+                </div>
+                
+                <div class="comment-content">
+                    一饭一楼的面很好吃，牛肉很新鲜。服务员态度也很好，就是菜品种类有点少，希望能增加一些新的菜品。
+                </div>
+                
+                <div class="comment-meta">
+                    <span class="canteen-tag">第一食堂</span>
+                    <span class="rating-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </span>
+                    <span class="sentiment-tag sentiment-positive">正面评价</span>
+                </div>
+                
+                <div class="comment-actions">
+                    <button class="action-btn approve" data-action="approve">
+                        <i class="fas fa-check"></i> 通过
+                    </button>
+                    <button class="action-btn" data-action="hide">
+                        <i class="fas fa-eye-slash"></i> 隐藏
+                    </button>
+                    <button class="action-btn" data-action="reply">
+                        <i class="fas fa-reply"></i> 回复
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- 分页器 -->
+        <div class="pagination">
+            <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </main>
     
     <script>
+        // 页面交互功能
         document.addEventListener('DOMContentLoaded', function() {
-            // 筛选按钮点击事件
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                if (!btn.querySelector('i.fa-sliders-h')) {
-                    btn.addEventListener('click', function() {
-                        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                    });
+            // 导航激活状态
+            const currentPage = '评论管理';
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                if (tab.textContent.includes(currentPage)) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
                 }
             });
             
-            // 操作按钮点击事件
+            // 筛选标签交互
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                });
+            });
+            
+            // 评论操作按钮交互
             document.querySelectorAll('.action-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const commentItem = this.closest('.comment-item');
-                    const userName = commentItem.querySelector('.user-name').textContent;
-                    const action = this.textContent.trim();
+                    const commentCard = this.closest('.comment-card');
+                    const userName = commentCard.querySelector('.user-name').textContent;
+                    const action = this.getAttribute('data-action');
                     
-                    if (action === '通过') {
-                        commentItem.classList.remove('unread');
-                        this.style.display = 'none';
-                        alert(`已通过 ${userName} 的评论`);
-                    } else if (action === '隐藏') {
-                        commentItem.style.opacity = '0.5';
-                        alert(`已隐藏 ${userName} 的评论`);
-                    } else if (action === '回复') {
-                        const reply = prompt(`回复 ${userName} 的评论:`);
-                        if (reply) {
-                            alert(`已发送回复: ${reply}`);
-                        }
+                    switch(action) {
+                        case 'approve':
+                            commentCard.classList.remove('unread');
+                            this.innerHTML = '<i class="fas fa-check-circle"></i> 已通过';
+                            this.classList.add('approve');
+                            this.disabled = true;
+                            alert(`已通过 ${userName} 的评论`);
+                            break;
+                        case 'hide':
+                        case 'reject':
+                            commentCard.style.opacity = '0.5';
+                            this.innerHTML = '<i class="fas fa-eye-slash"></i> 已隐藏';
+                            this.disabled = true;
+                            alert(`已隐藏 ${userName} 的评论`);
+                            break;
+                        case 'reply':
+                            const reply = prompt(`回复 ${userName} 的评论:`);
+                            if (reply) {
+                                alert(`已发送回复: ${reply}`);
+                            }
+                            break;
                     }
                 });
             });
@@ -819,58 +998,70 @@
             // 全选功能
             const selectAllCheckbox = document.getElementById('selectAll');
             selectAllCheckbox.addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('.comment-item input[type="checkbox"]');
+                const checkboxes = document.querySelectorAll('.comment-card input[type="checkbox"]');
                 checkboxes.forEach(cb => {
                     cb.checked = this.checked;
                 });
             });
             
             // 批量操作按钮
-            document.querySelectorAll('.batch-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const action = this.textContent.trim();
-                    const selectedCount = document.querySelectorAll('.comment-item input[type="checkbox"]:checked').length;
-                    
-                    if (selectedCount === 0 && action !== '导出选中') {
-                        alert('请先选择评论');
-                        return;
-                    }
-                    
-                    switch(action) {
-                        case '批量通过':
-                            alert(`已通过 ${selectedCount} 条评论`);
-                            break;
-                        case '批量隐藏':
-                            alert(`已隐藏 ${selectedCount} 条评论`);
-                            break;
-                        case '批量删除':
-                            if (confirm(`确定要删除 ${selectedCount} 条评论吗？`)) {
-                                alert(`已删除 ${selectedCount} 条评论`);
-                            }
-                            break;
-                        case '导出选中':
-                            alert('正在导出评论数据...');
-                            break;
-                    }
-                });
+            document.getElementById('batchApprove').addEventListener('click', function() {
+                const selectedCount = document.querySelectorAll('.comment-card input[type="checkbox"]:checked').length;
+                if (selectedCount === 0) {
+                    alert('请先选择评论');
+                    return;
+                }
+                alert(`已通过 ${selectedCount} 条评论`);
+            });
+            
+            document.getElementById('batchHide').addEventListener('click', function() {
+                const selectedCount = document.querySelectorAll('.comment-card input[type="checkbox"]:checked').length;
+                if (selectedCount === 0) {
+                    alert('请先选择评论');
+                    return;
+                }
+                alert(`已隐藏 ${selectedCount} 条评论`);
+            });
+            
+            document.getElementById('batchDelete').addEventListener('click', function() {
+                const selectedCount = document.querySelectorAll('.comment-card input[type="checkbox"]:checked').length;
+                if (selectedCount === 0) {
+                    alert('请先选择评论');
+                    return;
+                }
+                if (confirm(`确定要删除 ${selectedCount} 条评论吗？`)) {
+                    alert(`已删除 ${selectedCount} 条评论`);
+                }
+            });
+            
+            document.getElementById('batchExport').addEventListener('click', function() {
+                alert('正在导出评论数据...');
             });
             
             // 预警链接点击事件
-            document.querySelector('.alert-link').addEventListener('click', function() {
-                const negativeComments = document.querySelectorAll('.sentiment.negative');
+            document.getElementById('alertLink').addEventListener('click', function() {
+                const negativeComments = document.querySelectorAll('.sentiment-negative');
                 if (negativeComments.length > 0) {
-                    negativeComments[0].closest('.comment-item').scrollIntoView({
+                    negativeComments[0].closest('.comment-card').scrollIntoView({
                         behavior: 'smooth',
                         block: 'center'
                     });
                     alert('已定位到第一条负面评价');
                 }
             });
+            
+            // 分页按钮交互
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (!this.querySelector('i')) {
+                        document.querySelectorAll('.page-btn').forEach(b => {
+                            b.classList.remove('active');
+                        });
+                        this.classList.add('active');
+                    }
+                });
+            });
         });
-    </script>
-    <script src="./navbar.js"></script>
-    <script>
-        setActiveNav('评论管理');
     </script>
 </body>
 </html>
