@@ -609,6 +609,7 @@
             font-size: 13px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2; /* 标准属性补充，用于兼容性 */
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -803,9 +804,28 @@
         .hidden {
             display: none !important;
         }
+        .modal { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); z-index:1000; }
+        .modal.hidden { display:none; }
+        .modal-content { background:white; border-radius:8px; padding:16px; width:90%; max-width:900px; position:relative; }
+        .modal-close { position:absolute; top:8px; right:8px; border:none; background:transparent; font-size:20px; cursor:pointer; }
         
         .active-tab {
             display: block;
+        }
+        .admin-only { display: none; }
+        .admin-only .menu-text { color: var(--primary-color); font-weight:600; }
+        
+        /* 统一校区选择器样式（与首页保持一致） */
+        .school-selector {
+            margin-right: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .school-selector select {
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: white;
         }
         
         .text-red {
@@ -826,6 +846,13 @@
                 <span>校园食光</span>
             </div>
             <div class="nav-right">
+                <div class="school-selector">
+                    <select onchange="switchSchool(this.value)">
+                        <option>东莞理工学院</option>
+                        <option>广东科技学院</option>
+                    </select>
+                </div>
+                <div class="nav-item" onclick="ensureLoginModal(openLoginModal)">登录</div>
                 <div class="nav-item">消息</div>
                 <!-- <div class="nav-item active">个人中心</div> -->
                 <div class="nav-item">退出</div>
@@ -839,18 +866,18 @@
             <a href="用户“首页”界面.html" class="nav-tab">
                 <i class="fas fa-home"></i>首页
             </a>
-            <a href="community.html" class="nav-tab">
+            <a href="./用户“社区”界面.html" class="nav-tab">
                 <i class="fas fa-users"></i>社区
             </a>
-            <a href="canteen.html" class="nav-tab">
+            <a href="./用户“食堂”界面.html" class="nav-tab">
                 <i class="fas fa-store"></i>食堂
             </a>
             <a href="用户“我的”界面.html" class="nav-tab active">
                 <i class="fas fa-user"></i>我的
             </a>
-            <button class="ai-nav-btn" onclick="openAIChat(event)">
+            <a href="./用户“ai助手”界面.html" class="nav-tab">
                 <i class="fas fa-robot"></i>AI助手
-            </button>
+            </a>
         </div>
     </nav>
     
@@ -897,6 +924,12 @@
                             <div class="menu-text">我的收藏</div>
                             <div class="menu-badge">12</div>
                         </div>
+                        <div class="menu-item admin-only" data-section="workbench">
+                            <div class="menu-icon">
+                                <i class="fas fa-cubes"></i>
+                            </div>
+                            <div class="menu-text">进入工作台</div>
+                        </div>
                         <div class="menu-item" data-section="footprint">
                             <div class="menu-icon">
                                 <i class="fas fa-map-marker-alt"></i>
@@ -909,12 +942,7 @@
                             </div>
                             <div class="menu-text">AI对话历史</div>
                         </div>
-                        <div class="menu-item" data-section="ai-report">
-                            <div class="menu-icon">
-                                <i class="fas fa-chart-bar"></i>
-                            </div>
-                            <div class="menu-text">AI饮食报告</div>
-                        </div>
+
                         <div class="menu-item">
                             <div class="menu-icon">
                                 <i class="fas fa-history"></i>
@@ -1094,19 +1122,66 @@
                             <p>足迹地图可视化</p>
                             <p style="font-size: 12px; margin-top: 5px;">点击点位可跳转食堂详情页</p>
                         </div>
+                        <div style="margin-top:8px;">
+                            <button class="btn" onclick="toggleFootprintView()">切换地图</button>
+                        </div>
                         
                         <div class="map-points">
-                            <div class="map-point">松山湖第一食堂（第一食堂 / 一饭）</div>
-                            <div class="map-point">松山湖第二食堂（第二食堂 / 二饭）</div>
-                            <div class="map-point">松山湖第三食堂（第三食堂 / 三饭）</div>
-                            <div class="map-point">莞城食堂（莞城饭堂）</div>
-                            <div class="map-point">学术餐厅</div>
+                            <div class="map-point" onclick="goToCanteenDetail(1)">松山湖第一食堂（第一食堂 / 一饭）</div>
+                            <div class="map-point" onclick="goToCanteenDetail(2)">松山湖第二食堂（第二食堂 / 二饭）</div>
+                            <div class="map-point" onclick="goToCanteenDetail(3)">松山湖第三食堂（第三食堂 / 三饭）</div>
+                            <div class="map-point" onclick="goToCanteenDetail(4)">莞城食堂（莞城饭堂）</div>
+                            <div class="map-point" onclick="goToCanteenDetail(5)">学术餐厅</div>
                         </div>
                     </div>
                     
                     <div class="dynamic-card">
                         <div class="card-body">
                             <h3 class="card-title">最近访问</h3>
+                            <p style="margin-bottom: 10px; color: var(--text-light); font-size: 13px;">根据您的浏览记录生成</p>
+                            
+                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                <span style="background-color: #f5f5f5; padding: 5px 10px; border-radius: 3px; font-size: 13px;">
+                                    <i class="fas fa-store" style="margin-right: 5px;"></i>松山湖第一食堂
+                                </span>
+                                <span style="background-color: #f5f5f5; padding: 5px 10px; border-radius: 3px; font-size: 13px;">
+                                    <i class="fas fa-utensils" style="margin-right: 5px;"></i>麻辣香锅
+                                </span>
+                                <span style="background-color: #f5f5f5; padding: 5px 10px; border-radius: 3px; font-size: 13px;">
+                                    <i class="fas fa-store" style="margin-right: 5px;"></i>松山湖第二食堂
+                                </span>
+                                <span style="background-color: #f5f5f5; padding: 5px 10px; border-radius: 3px; font-size: 13px;">
+                                    <i class="fas fa-utensils" style="margin-right: 5px;"></i>豆浆油条
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI饮食报告（作为我的足迹下的子模块） -->
+                    <div class="dynamic-card">
+                        <div class="card-body">
+                            <h3 class="card-title">AI饮食报告（数据分析）</h3>
+                            <div class="report-stats" style="display:flex; gap:20px; margin-top:10px;">
+                                <div class="stat-item">
+                                    <div class="stat-value">18</div>
+                                    <div class="stat-label">本月用餐次数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">¥425</div>
+                                    <div class="stat-label">本月消费总额</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">4.6</div>
+                                    <div class="stat-label">平均评分</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">7</div>
+                                    <div class="stat-label">尝试新菜品</div>
+                                </div>
+                            </div>
+                            <div style="margin-top:12px;">根据您的饮食记录分析，您对辣味食品的偏好明显（占比65%），建议适当增加蔬菜和清淡食物的摄入。推荐尝试莞城食堂的蔬菜沙拉和松山湖第二食堂的蒸菜系列，以达到更均衡的饮食结构。</div>
+                        </div>
+                    </div>
                             <p style="margin-bottom: 10px; color: var(--text-light); font-size: 13px;">根据您的浏览记录生成</p>
                             
                             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
@@ -1158,62 +1233,21 @@
                     </div>
                 </div>
                 
-                <!-- AI饮食报告区域 -->
-                <div id="ai-report" class="tab-content hidden">
-                    <h2 style="margin-bottom: var(--spacing-medium); font-size: 20px;">AI饮食报告</h2>
-                    
-                    <div class="report-card">
-                        <div class="report-header">
-                            <div class="report-title">12月饮食分析报告</div>
-                            <div class="report-date">生成时间：2025-12-22</div>
-                        </div>
-                        
-                        <div class="report-stats">
-                            <div class="stat-item">
-                                <div class="stat-value">18</div>
-                                <div class="stat-label">本月用餐次数</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">¥425</div>
-                                <div class="stat-label">本月消费总额</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">4.6</div>
-                                <div class="stat-label">平均评分</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">7</div>
-                                <div class="stat-label">尝试新菜品</div>
-                            </div>
-                        </div>
-                        
-                        <div class="report-recommendation">
-                            <div class="recommendation-title">AI饮食建议</div>
-                            <div class="recommendation-content">
-                                根据您的饮食记录分析，您对辣味食品的偏好明显（占比65%），建议适当增加蔬菜和清淡食物的摄入。推荐尝试莞城食堂的蔬菜沙拉和松山湖第二食堂的蒸菜系列，以达到更均衡的饮食结构。
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top: var(--spacing-large);">
-                            <h4 style="margin-bottom: 10px;">推荐食堂</h4>
-                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                                <span style="background-color: #f0f9ff; color: var(--tag-blue); padding: 5px 10px; border-radius: 3px; font-size: 13px;">
-                                    松山湖第一食堂
-                                </span>
-                                <span style="background-color: #f0f9ff; color: var(--tag-blue); padding: 5px 10px; border-radius: 3px; font-size: 13px;">
-                                    松山湖第二食堂
-                                </span>
-                                <span style="background-color: #f0f9ff; color: var(--tag-blue); padding: 5px 10px; border-radius: 3px; font-size: 13px;">
-                                    莞城食堂夜宵档
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>
     
+    <!-- 校园地图弹窗 -->
+    <div id="campus-map-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCampusMap()">×</button>
+            <div class="campus-map-container" style="height:70vh; display:flex; align-items:center; justify-content:center;">
+                <p>地图加载中（示例）</p>
+            </div>
+        </div>
+    </div>
+
     <!-- 页脚 -->
     <footer class="footer">
         <div class="container">
@@ -1306,16 +1340,85 @@
                     });
                     
                     // 显示对应的内容区域
-                    document.getElementById(`my-${section}`).classList.remove('hidden');
+                    const target = document.getElementById(`my-${section}`);
+                    if(target) target.classList.remove('hidden');
                 }
             });
         });
+
+        // 管理员菜单项点击 - 显示工作台（示例）
+        const adminItems = document.querySelectorAll('.menu-item.admin-only');
+        if(adminItems.length) {
+            adminItems.forEach(it => {
+                it.addEventListener('click', function() {
+                    alert('进入管理员工作台（示例）');
+                });
+            });
+        }
         
         // 初始化显示我的动态
         document.addEventListener('DOMContentLoaded', function() {
             // 默认显示我的动态
             document.getElementById('my-dynamics').classList.remove('hidden');
         });
+
+        // 切换学校（示例）
+        function switchSchool(school) {
+            alert('已切换到：' + school + '（示例）');
+            // TODO：保存到 localStorage 或发送给后端
+        }
+
+        // 延迟加载并打开统一登录弹窗（从 login-modal.html 动态加载）
+        function ensureLoginModal(callback) {
+            if(document.getElementById('login-modal')) {
+                if(callback) callback();
+                return;
+            }
+            fetch('login-modal.html').then(r => r.text()).then(html => {
+                const container = document.createElement('div');
+                container.innerHTML = html;
+                document.body.appendChild(container);
+                if(callback) callback();
+            }).catch(err => {
+                console.error('加载登录弹窗失败', err);
+                alert('无法加载登录弹窗（示例）');
+            });
+        }
+
+        function openLoginModal() {
+            ensureLoginModal(function(){
+                const modal = document.getElementById('login-modal');
+                if(modal) modal.classList.remove('hidden');
+                // call render state if available
+                if(typeof renderLoginState === 'function') renderLoginState();
+            });
+        }
+
+        // 切换我的足迹视图（文字/地图）
+        function toggleFootprintView() {
+            const map = document.querySelector('.map-placeholder');
+            const points = document.querySelector('.map-points');
+            if(map && points) {
+                map.classList.toggle('hidden');
+                points.classList.toggle('hidden');
+            }
+        }
+
+        // 点击点位跳转到食堂详情（示例）
+        function goToCanteenDetail(id) {
+            // 在实际项目中根据 id 跳转到 /merchant/:id
+            window.location.href = `canteen-detail.html?id=${id}`;
+        }
+
+        // 校园地图弹窗
+        function openCampusMap() {
+            const modal = document.getElementById('campus-map-modal');
+            if(modal) modal.classList.remove('hidden');
+        }
+        function closeCampusMap() {
+            const modal = document.getElementById('campus-map-modal');
+            if(modal) modal.classList.add('hidden');
+        }
     </script>
 </body>
 </html>

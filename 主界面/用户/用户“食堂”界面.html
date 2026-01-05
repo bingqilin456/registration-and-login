@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>食堂 - 校园食光</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 全局样式 - 遵循设计规范 */
+        :root {
+            --primary-color: #e60012; /* 大众点评红 */
+            --bg-gray: #f8f8f8; /* 背景灰 */
+            --border-color: #e5e5e5; /* 浅灰边框 */
+            --text-dark: #333; /* 深灰文字 */
+            --text-light: #999; /* 浅灰文字 */
+            --status-open: #52c41a; /* 营业中 */
+            --status-closed: #ff4d4f; /* 已关闭 */
+            --rating-color: #ffc107; /* 评分金色 */
+            --tag-blue: #1890ff; /* 标签蓝 */
+            --spacing-small: 8px;
+            --spacing-medium: 15px;
+            --spacing-large: 20px;
+            --border-radius: 4px;
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-large);
+        }
+        
+        /* 顶部导航栏 */
+        .global-nav {
+            background-color: var(--primary-color);
+            height: 45px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            color: white;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-item {
+            margin-left: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            position: relative;
+            padding: 5px 0;
+        }
+        
+        .nav-item:hover {
+            opacity: 0.9;
+        }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: white;
+        }
+        
+        /* 主导航 - 改为超链接样式 */
+        .main-nav {
+            background-color: white;
+            height: 50px;
+            margin-top: 45px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 主导航项改为a标签样式 */
+        .nav-tab {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--text-dark);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            text-decoration: none; /* 移除下划线 */
+        }
+        
+        /* 悬停状态 */
+        .nav-tab:hover {
+            color: var(--primary-color);
+            text-decoration: none; /* 确保悬停时没有下划线 */
+        }
+        
+        /* 当前页面激活状态 */
+        .nav-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-tab i {
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        
+        /* AI助手特殊按钮样式 */
+        .ai-nav-btn {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--text-dark);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            background: none;
+            border: none;
+            font-family: inherit;
+            padding: 0;
+        }
+        
+        .ai-nav-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        /* 食堂页面特有样式 */
+        .main-content {
+            margin-top: var(--spacing-large);
+            padding-bottom: 50px;
+        }
+        
+        /* 搜索和筛选区域 */
+        .canteen-filter {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .search-bar {
+            display: flex;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .search-input-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            padding: 0 15px;
+            margin-right: 10px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            background-color: transparent;
+            font-size: 14px;
+            outline: none;
+            padding: 12px 0;
+        }
+        
+        .search-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-medium);
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .filter-label {
+            margin-right: 10px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* 视图切换按钮 */
+        .view-toggle {
+            display: flex;
+            margin-left: auto;
+        }
+        
+        .view-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .view-btn:first-child {
+            border-radius: 3px 0 0 3px;
+        }
+        
+        .view-btn:last-child {
+            border-radius: 0 3px 3px 0;
+            border-left: none;
+        }
+        
+        .view-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* 食堂列表布局 */
+        .canteen-layout {
+            display: flex;
+            gap: var(--spacing-large);
+        }
+        
+        /* 左侧筛选面板 */
+        .filter-sidebar {
+            width: 250px;
+            flex-shrink: 0;
+        }
+        
+        .filter-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .filter-title {
+            font-size: 16px;
+            margin-bottom: var(--spacing-medium);
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filter-section {
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .filter-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        
+        .filter-checkbox input {
+            margin-right: 8px;
+        }
+        
+        .filter-checkbox-label {
+            font-size: 13px;
+        }
+        
+        .filter-slider {
+            width: 100%;
+            height: 4px;
+            background-color: #e5e5e5;
+            border-radius: 2px;
+            margin: 15px 0;
+            position: relative;
+        }
+        
+        .slider-track {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+        
+        .slider-handle {
+            width: 16px;
+            height: 16px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        
+        .price-range {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+        
+        /* 主内容区 */
+        .canteen-content {
+            flex: 1;
+        }
+        
+        /* 食堂卡片 - 列表视图 */
+        .canteen-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .canteen-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .card-content {
+            display: flex;
+            padding: var(--spacing-medium);
+        }
+        
+        .card-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 3px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 14px;
+            flex-shrink: 0;
+            margin-right: var(--spacing-medium);
+        }
+        
+        .card-info {
+            flex: 1;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .canteen-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .canteen-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .canteen-rating {
+            color: var(--rating-color);
+            font-size: 14px;
+        }
+        
+        .canteen-review-count {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+        
+        .canteen-status {
+            color: var(--status-open);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 3px 8px;
+            background-color: rgba(82, 196, 26, 0.1);
+            border-radius: 3px;
+        }
+        
+        .canteen-status.closed {
+            color: var(--status-closed);
+            background-color: rgba(255, 77, 79, 0.1);
+        }
+        
+        .canteen-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .canteen-tag {
+            background-color: #f0f9ff;
+            color: var(--tag-blue);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
+        .canteen-desc {
+            color: var(--text-dark);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .canteen-features {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .feature-item i {
+            margin-right: 5px;
+        }
+        
+        .card-footer {
+            padding: var(--spacing-medium);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f9f9f9;
+        }
+        
+        .canteen-distance {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+        
+        .canteen-distance i {
+            margin-right: 5px;
+        }
+        
+        /* 网格视图 */
+        .grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--spacing-large);
+        }
+        
+        .grid-view .canteen-card {
+            margin-bottom: 0;
+        }
+        
+        .grid-view .card-content {
+            flex-direction: column;
+        }
+        
+        .grid-view .card-img {
+            width: 100%;
+            height: 150px;
+            margin-right: 0;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        /* 地图视图 */
+        .map-view {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: var(--spacing-medium);
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 16px;
+        }
+        
+        .map-placeholder {
+            text-align: center;
+        }
+        
+        .map-placeholder i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #a0d0ff;
+        }
+        
+        /* 校区标签 */
+        .campus-tag {
+            background-color: #f0f9ff;
+            color: var(--tag-blue);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+        
+        /* 页脚 */
+        .footer {
+            background-color: white;
+            padding: var(--spacing-large) 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* AI悬浮按钮 */
+        .ai-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-color), #ff5252);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+            z-index: 100;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .ai-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(230, 0, 18, 0.4);
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #d5000f;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-outline {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .canteen-layout {
+                flex-direction: column;
+            }
+            
+            .filter-sidebar {
+                width: 100%;
+            }
+            
+            .grid-view {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--spacing-medium);
+            }
+            
+            .nav-tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .nav-tab, .ai-nav-btn {
+                min-width: 100px;
+                font-size: 14px;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .search-input-container {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .grid-view {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-content {
+                flex-direction: column;
+            }
+            
+            .card-img {
+                width: 100%;
+                height: 150px;
+                margin-right: 0;
+                margin-bottom: var(--spacing-medium);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .ai-fab {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .canteen-features {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+        
+        /* 工具类 */
+        .hidden {
+            display: none !important;
+        }
+        .modal { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); z-index:1000; }
+        .modal.hidden { display:none; }
+        .modal-content { background:white; border-radius:8px; padding:16px; width:90%; max-width:900px; position:relative; }
+        .modal-close { position:absolute; top:8px; right:8px; border:none; background:transparent; font-size:20px; cursor:pointer; }
+        
+        .active-tab {
+            display: block;
+        }
+        
+        /* 统一校区选择器样式 */
+        .school-selector {
+            margin-right: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .school-selector select {
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+        
+        .text-red {
+            color: var(--primary-color);
+        }
+        
+        .text-green {
+            color: var(--status-open);
+        }
+        
+        /* 排序选项 */
+        .sort-options {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-medium);
+            padding: var(--spacing-medium);
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+        }
+        
+        .sort-label {
+            margin-right: 10px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .sort-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .sort-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            background-color: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .sort-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .sort-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        /* 加载更多按钮 */
+        .load-more {
+            text-align: center;
+            margin-top: var(--spacing-large);
+        }
+        
+        .load-more-btn {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 3px;
+            padding: 10px 30px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .load-more-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* 快速筛选标签 */
+        .quick-filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .quick-tag {
+            background-color: #f5f5f5;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-tag:hover {
+            background-color: #e9e9e9;
+        }
+        
+        .quick-tag.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* 食堂特色图标 */
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 10px;
+            margin-right: 5px;
+        }
+        
+        .feature-icon.has-feature {
+            background-color: rgba(82, 196, 26, 0.1);
+            color: var(--status-open);
+        }
+    </style>
+</head>
+<body>
+    <!-- 全局导航栏 -->
+    <nav class="global-nav">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>校园食光</span>
+            </div>
+            <div class="nav-right">
+                <div class="school-selector">
+                    <select onchange="switchSchool(this.value)">
+                        <option>东莞理工学院</option>
+                        <option>广东科技学院</option>
+                    </select>
+                </div>
+                <div class="nav-item" onclick="ensureLoginModal(openLoginModal)">登录</div>
+                <div class="nav-item">消息</div>
+                <!-- <div class="nav-item">个人中心</div> -->
+                <div class="nav-item">退出</div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主导航 - 已改为真正的超链接 -->
+    <nav class="main-nav">
+        <div class="nav-tabs">
+            <a href="用户“首页”界面.html" class="nav-tab">
+                <i class="fas fa-home"></i>首页
+            </a>
+            <a href="./用户“社区”界面.html" class="nav-tab">
+                <i class="fas fa-users"></i>社区
+            </a>
+            <a href="./用户“食堂”界面.html" class="nav-tab active">
+                <i class="fas fa-store"></i>食堂
+            </a>
+            <a href="用户“我的”界面.html" class="nav-tab">
+                <i class="fas fa-user"></i>我的
+            </a>
+            <a href="./用户“ai助手”界面.html" class="nav-tab">
+                <i class="fas fa-robot"></i>AI助手
+            </a>
+        </div>
+    </nav>
+    
+    <!-- 主内容区域 -->
+    <div class="container">
+        <div class="main-content">
+            <!-- 搜索和筛选区域 -->
+            <div class="canteen-filter">
+                <div class="search-bar">
+                    <div class="search-input-container">
+                        <i class="fas fa-search" style="color: #999; margin-right: 10px;"></i>
+                        <input type="text" class="search-input" placeholder="搜索食堂名称、菜品或特色...">
+                    </div>
+                    <button class="search-btn" onclick="searchCanteens()">搜索食堂</button>
+                </div>
+                
+                <!-- 快速筛选标签 -->
+                <div class="quick-filter-tags">
+                    <div class="quick-tag active" onclick="filterByTag('all')">全部</div>
+                    <div class="quick-tag" onclick="filterByTag('nearby')">附近</div>
+                    <div class="quick-tag" onclick="filterByTag('high-rating')">高评分</div>
+                    <div class="quick-tag" onclick="filterByTag('cheap')">实惠</div>
+                    <div class="quick-tag" onclick="filterByTag('clean')">环境好</div>
+                    <div class="quick-tag" onclick="filterByTag('fast')">出餐快</div>
+                </div>
+                
+                <div class="filter-options">
+                    <div class="filter-group">
+                        <div class="filter-label">校区:</div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" onclick="filterByCampus('all')">全部</button>
+                            <button class="filter-btn" onclick="filterByCampus('松山湖')">松山湖</button>
+                            <button class="filter-btn" onclick="filterByCampus('莞城')">莞城</button>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">营业状态:</div>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" onclick="filterByStatus('all')">全部</button>
+                            <button class="filter-btn" onclick="filterByStatus('open')">营业中</button>
+                            <button class="filter-btn" onclick="filterByStatus('closed')">已关闭</button>
+                        </div>
+                    </div>
+                    
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="changeView('list')">
+                            <i class="fas fa-list"></i> 列表
+                        </button>
+                        <button class="view-btn" onclick="changeView('grid')">
+                            <i class="fas fa-th-large"></i> 网格
+                        </button>
+                        <button class="view-btn" onclick="changeView('map')">
+                            <i class="fas fa-map"></i> 地图
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 排序选项 -->
+            <div class="sort-options">
+                <div class="sort-label">排序:</div>
+                <div class="sort-buttons">
+                    <button class="sort-btn active" onclick="sortCanteens('default')">默认</button>
+                    <button class="sort-btn" onclick="sortCanteens('rating')">评分最高</button>
+                    <button class="sort-btn" onclick="sortCanteens('distance')">距离最近</button>
+                    <button class="sort-btn" onclick="sortCanteens('price')">人均最低</button>
+                    <button class="sort-btn" onclick="sortCanteens('reviews')">评价最多</button>
+                </div>
+            </div>
+            
+            <!-- 食堂内容区域 -->
+            <div class="canteen-layout">
+                <!-- 左侧筛选面板 -->
+                <div class="filter-sidebar">
+                    <div class="filter-card">
+                        <h3 class="filter-title">筛选条件</h3>
+                        
+                        <div class="filter-section">
+                            <div class="section-title">食堂类型</div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="type1" checked>
+                                <label for="type1" class="filter-checkbox-label">学生食堂</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="type2" checked>
+                                <label for="type2" class="filter-checkbox-label">教工食堂</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="type3">
+                                <label for="type3" class="filter-checkbox-label">特色餐厅</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="type4">
+                                <label for="type4" class="filter-checkbox-label">清真食堂</label>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-section">
+                            <div class="section-title">人均价格</div>
+                            <div class="filter-slider">
+                                <div class="slider-track" style="width: 70%;"></div>
+                                <div class="slider-handle" style="left: 70%;"></div>
+                            </div>
+                            <div class="price-range">
+                                <span>¥0</span>
+                                <span>¥50+</span>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-section">
+                            <div class="section-title">食堂特色</div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="feature1">
+                                <label for="feature1" class="filter-checkbox-label">支持校园卡</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="feature2">
+                                <label for="feature2" class="filter-checkbox-label">支持移动支付</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="feature3">
+                                <label for="feature3" class="filter-checkbox-label">提供外卖</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="feature4">
+                                <label for="feature4" class="filter-checkbox-label">空调环境</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="feature5">
+                                <label for="feature5" class="filter-checkbox-label">Wi-Fi覆盖</label>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-section">
+                            <div class="section-title">菜品类别</div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="category1">
+                                <label for="category1" class="filter-checkbox-label">粤菜</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="category2">
+                                <label for="category2" class="filter-checkbox-label">川湘菜</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="category3">
+                                <label for="category3" class="filter-checkbox-label">面食</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="category4">
+                                <label for="category4" class="filter-checkbox-label">快餐</label>
+                            </div>
+                            <div class="filter-checkbox">
+                                <input type="checkbox" id="category5">
+                                <label for="category5" class="filter-checkbox-label">清真</label>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" style="width: 100%; margin-top: 15px;" onclick="applyFilters()">
+                            <i class="fas fa-filter"></i> 应用筛选
+                        </button>
+                        <button class="btn btn-outline" style="width: 100%; margin-top: 8px;" onclick="resetFilters()">
+                            <i class="fas fa-redo"></i> 重置筛选
+                        </button>
+                    </div>
+                    
+                    <!-- AI推荐卡片 -->
+                    <div class="filter-card">
+                        <h3 class="filter-title">AI推荐</h3>
+                        <div style="font-size: 13px; color: var(--text-dark); margin-bottom: 10px;">
+                            根据您的饮食偏好和历史记录，为您推荐以下食堂：
+                        </div>
+                        <div style="padding: 10px; background-color: #f0f9ff; border-radius: 3px; margin-bottom: 10px;">
+                            <div style="font-weight: 500; margin-bottom: 5px;">松山湖第一食堂</div>
+                            <div style="font-size: 12px; color: var(--text-light);">
+                                匹配度：92%<br>
+                                推荐理由：符合您的辣味偏好，人均消费适中
+                            </div>
+                        </div>
+                        <button class="btn" style="width: 100%;" onclick="openAIChat(event)">
+                            <i class="fas fa-robot"></i> 获取个性化推荐
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 主内容区 -->
+                <div class="canteen-content">
+                    <!-- 列表视图 -->
+                    <div id="list-view" class="view-content active-tab">
+                        <!-- 食堂卡片1 -->
+                        <div class="canteen-card">
+                            <div class="card-content">
+                                <div class="card-img">第一食堂外观</div>
+                                <div class="card-info">
+                                    <div class="card-header">
+                                        <div>
+                                            <div class="canteen-name">第一食堂（一饭）<span class="campus-tag">松山湖</span></div>
+                                            <div class="canteen-meta">
+                                                <span class="canteen-rating"><i class="fas fa-star"></i> 4.8</span>
+                                                <span class="canteen-review-count">(156人评价)</span>
+                                                <span class="canteen-status">营业中</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="canteen-tags">
+                                        <span class="canteen-tag">粤菜</span>
+                                        <span class="canteen-tag">烧腊</span>
+                                        <span class="canteen-tag">经济实惠</span>
+                                        <span class="canteen-tag">早餐</span>
+                                    </div>
+                                    
+                                    <p class="canteen-desc">位于松山湖校区教学区中心，提供多种风味菜品，价格实惠，是学生日常用餐的主要场所。一楼以大众快餐为主，二楼有特色窗口和烧腊档。</p>
+                                    
+                                    <div class="canteen-features">
+                                        <div class="feature-item">
+                                            <i class="fas fa-money-bill-wave"></i> 人均：¥10-20
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-wifi"></i></span> Wi-Fi
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-snowflake"></i></span> 空调
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon"><i class="fas fa-motorcycle"></i></span> 外卖
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="canteen-distance">
+                                    <i class="fas fa-map-marker-alt"></i> 教学楼A区旁，200m
+                                </div>
+                                <div>
+                                    <a href="canteen-detail.html?id=1" class="btn">查看详情</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 食堂卡片2 -->
+                        <div class="canteen-card">
+                            <div class="card-content">
+                                <div class="card-img">第二食堂外观</div>
+                                <div class="card-info">
+                                    <div class="card-header">
+                                        <div>
+                                            <div class="canteen-name">第二食堂（二饭）<span class="campus-tag">松山湖</span></div>
+                                            <div class="canteen-meta">
+                                                <span class="canteen-rating"><i class="fas fa-star"></i> 4.6</span>
+                                                <span class="canteen-review-count">(128人评价)</span>
+                                                <span class="canteen-status">营业中</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="canteen-tags">
+                                        <span class="canteen-tag">川湘菜</span>
+                                        <span class="canteen-tag">麻辣烫</span>
+                                        <span class="canteen-tag">风味小吃</span>
+                                        <span class="canteen-tag">夜宵</span>
+                                    </div>
+                                    
+                                    <p class="canteen-desc">菜品丰富多样，以川湘菜系为主，口味偏重，深受喜欢重口味同学的喜爱。特色窗口包括麻辣烫、重庆小面、麻辣香锅等，夜宵供应至22:30。</p>
+                                    
+                                    <div class="canteen-features">
+                                        <div class="feature-item">
+                                            <i class="fas fa-money-bill-wave"></i> 人均：¥12-25
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-wifi"></i></span> Wi-Fi
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-snowflake"></i></span> 空调
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-motorcycle"></i></span> 外卖
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="canteen-distance">
+                                    <i class="fas fa-map-marker-alt"></i> 实验楼附近，450m
+                                </div>
+                                <div>
+                                    <a href="canteen-detail.html?id=2" class="btn">查看详情</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 食堂卡片3 -->
+                        <div class="canteen-card">
+                            <div class="card-content">
+                                <div class="card-img">第三食堂外观</div>
+                                <div class="card-info">
+                                    <div class="card-header">
+                                        <div>
+                                            <div class="canteen-name">第三食堂（三饭）<span class="campus-tag">松山湖</span></div>
+                                            <div class="canteen-meta">
+                                                <span class="canteen-rating"><i class="fas fa-star"></i> 4.7</span>
+                                                <span class="canteen-review-count">(98人评价)</span>
+                                                <span class="canteen-status">营业中</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="canteen-tags">
+                                        <span class="canteen-tag">煲仔饭</span>
+                                        <span class="canteen-tag">面食</span>
+                                        <span class="canteen-tag">特色菜</span>
+                                        <span class="canteen-tag">环境好</span>
+                                    </div>
+                                    
+                                    <p class="canteen-desc">以传统粤菜和特色煲仔饭闻名，环境整洁，价格适中，深受师生欢迎。提供多种面食选择，包括拉面、刀削面、云吞面等，适合不同口味需求。</p>
+                                    
+                                    <div class="canteen-features">
+                                        <div class="feature-item">
+                                            <i class="fas fa-money-bill-wave"></i> 人均：¥15-30
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-wifi"></i></span> Wi-Fi
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-snowflake"></i></span> 空调
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon"><i class="fas fa-motorcycle"></i></span> 外卖
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="canteen-distance">
+                                    <i class="fas fa-map-marker-alt"></i> 宿舍区旁，650m
+                                </div>
+                                <div>
+                                    <a href="canteen-detail.html?id=3" class="btn">查看详情</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 食堂卡片4 -->
+                        <div class="canteen-card">
+                            <div class="card-content">
+                                <div class="card-img">莞城食堂外观</div>
+                                <div class="card-info">
+                                    <div class="card-header">
+                                        <div>
+                                            <div class="canteen-name">莞城食堂<span class="campus-tag">莞城校区</span></div>
+                                            <div class="canteen-meta">
+                                                <span class="canteen-rating"><i class="fas fa-star"></i> 4.5</span>
+                                                <span class="canteen-review-count">(76人评价)</span>
+                                                <span class="canteen-status">营业中</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="canteen-tags">
+                                        <span class="canteen-tag">肠粉</span>
+                                        <span class="canteen-tag">早茶</span>
+                                        <span class="canteen-tag">粤式点心</span>
+                                        <span class="canteen-tag">传统</span>
+                                    </div>
+                                    
+                                    <p class="canteen-desc">莞城校区主食堂，以传统粤式早茶和点心闻名，提供现做肠粉、虾饺、烧卖等经典广式点心。环境宽敞明亮，适合早餐和午餐。</p>
+                                    
+                                    <div class="canteen-features">
+                                        <div class="feature-item">
+                                            <i class="fas fa-money-bill-wave"></i> 人均：¥8-20
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-wifi"></i></span> Wi-Fi
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon has-feature"><i class="fas fa-snowflake"></i></span> 空调
+                                        </div>
+                                        <div class="feature-item">
+                                            <span class="feature-icon"><i class="fas fa-motorcycle"></i></span> 外卖
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="canteen-distance">
+                                    <i class="fas fa-map-marker-alt"></i> 莞城校区主楼旁，1.2km
+                                </div>
+                                <div>
+                                    <a href="canteen-detail.html?id=4" class="btn">查看详情</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 网格视图 -->
+                    <div id="grid-view" class="view-content hidden grid-view">
+                        <!-- 网格视图内容会通过JS动态生成 -->
+                    </div>
+                    
+                    <!-- 地图视图 -->
+                    <div id="map-view" class="view-content hidden">
+                        <div class="map-view">
+                            <div class="map-placeholder">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <p>食堂地图视图</p>
+                                <p style="font-size: 14px; margin-top: 10px;">点击地图上的标记可查看食堂详情</p>
+                                <button class="btn" style="margin-top: 15px;" onclick="openCampusMap()">
+                                    <i class="fas fa-expand"></i> 打开全屏地图
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 加载更多 -->
+                    <div class="load-more">
+                        <button class="load-more-btn" onclick="loadMoreCanteens()">
+                            <i class="fas fa-sync-alt"></i> 加载更多食堂
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 校园地图弹窗 -->
+    <div id="campus-map-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCampusMap()">×</button>
+            <div class="campus-map-container" style="height:70vh; display:flex; align-items:center; justify-content:center;">
+                <p>地图加载中（示例）</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>校园食光 - 多校AI美食社区平台</p>
+            <p>平台域名：campusfood.cn | © 2025 校园食光 版权所有</p>
+        </div>
+    </footer>
+    
+    <!-- AI悬浮按钮 -->
+    <div class="ai-fab" onclick="openAIChat(event)">
+        <i class="fas fa-robot"></i>
+    </div>
+    
+    <script>
+        // 主导航现在已经是超链接，不需要JavaScript处理跳转
+        // 只需要为AI助手按钮添加事件
+        
+        // 打开AI对话
+        function openAIChat(event) {
+            if(event) event.preventDefault();
+            alert('打开AI对话弹窗...');
+            // 实际项目中，这里会打开一个模态对话框
+        }
+        
+        // 搜索食堂功能
+        function searchCanteens() {
+            const searchInput = document.querySelector('.search-input');
+            const query = searchInput.value.trim();
+            if(query) {
+                alert(`搜索关键词: ${query}`);
+                // 在实际项目中，这里会筛选或重新加载食堂列表
+            } else {
+                alert('请输入搜索内容');
+            }
+        }
+        
+        // 回车键搜索
+        document.querySelector('.search-input').addEventListener('keypress', function(e) {
+            if(e.key === 'Enter') {
+                searchCanteens();
+            }
+        });
+        
+        // 快速筛选标签
+        function filterByTag(tag) {
+            // 更新激活状态
+            document.querySelectorAll('.quick-tag').forEach(t => {
+                t.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            console.log(`按标签筛选: ${tag}`);
+            // 在实际项目中，这里会筛选食堂列表
+        }
+        
+        // 按校区筛选
+        function filterByCampus(campus) {
+            // 更新激活状态
+            const buttons = event.target.parentElement.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            console.log(`按校区筛选: ${campus}`);
+            // 在实际项目中，这里会筛选食堂列表
+        }
+        
+        // 按营业状态筛选
+        function filterByStatus(status) {
+            // 更新激活状态
+            const buttons = event.target.parentElement.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            console.log(`按状态筛选: ${status}`);
+            // 在实际项目中，这里会筛选食堂列表
+        }
+        
+        // 切换视图
+        function changeView(viewType) {
+            // 更新视图按钮激活状态
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 隐藏所有视图
+            document.querySelectorAll('.view-content').forEach(view => {
+                view.classList.add('hidden');
+            });
+            
+            // 显示选中的视图
+            document.getElementById(`${viewType}-view`).classList.remove('hidden');
+            
+            // 如果是网格视图，需要重新生成内容
+            if(viewType === 'grid') {
+                generateGridView();
+            }
+        }
+        
+        // 生成网格视图
+        function generateGridView() {
+            const gridView = document.getElementById('grid-view');
+            const listView = document.getElementById('list-view');
+            
+            // 清空网格视图内容
+            gridView.innerHTML = '';
+            
+            // 从列表视图复制卡片到网格视图
+            const cards = listView.querySelectorAll('.canteen-card');
+            cards.forEach(card => {
+                const clone = card.cloneNode(true);
+                gridView.appendChild(clone);
+            });
+        }
+        
+        // 排序食堂
+        function sortCanteens(sortBy) {
+            // 更新排序按钮激活状态
+            const buttons = event.target.parentElement.querySelectorAll('.sort-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            console.log(`按 ${sortBy} 排序`);
+            // 在实际项目中，这里会重新排序食堂列表
+        }
+        
+        // 应用筛选条件
+        function applyFilters() {
+            alert('应用筛选条件...');
+            // 在实际项目中，这里会根据筛选条件重新加载食堂列表
+        }
+        
+        // 重置筛选条件
+        function resetFilters() {
+            // 重置所有复选框
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // 重置前两个复选框（学生食堂和教工食堂）
+            document.getElementById('type1').checked = true;
+            document.getElementById('type2').checked = true;
+            
+            // 重置快速筛选标签
+            document.querySelectorAll('.quick-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            document.querySelector('.quick-tag[onclick*="all"]').classList.add('active');
+            
+            // 重置校区筛选
+            document.querySelectorAll('.filter-btn[onclick*="Campus"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.filter-btn[onclick*="all"]').classList.add('active');
+            
+            // 重置状态筛选
+            document.querySelectorAll('.filter-btn[onclick*="Status"]').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.filter-btn[onclick*="all"]').classList.add('active');
+            
+            alert('筛选条件已重置');
+        }
+        
+        // 加载更多食堂
+        function loadMoreCanteens() {
+            alert('加载更多食堂...');
+            // 在实际项目中，这里会通过AJAX加载更多食堂
+        }
+        
+        // 页面加载时，根据当前URL设置主导航激活状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = decodeURIComponent((window.location.pathname.split('/').pop() || 'index.html'));
+            const navTabs = document.querySelectorAll('.nav-tab');
+            let anyActive = false;
+
+            navTabs.forEach(tab => {
+                // 获取超链接的href
+                const href = tab.getAttribute('href') || '';
+                const tabPage = decodeURIComponent(href.split('/').pop() || '');
+                // 如果是当前页面，添加active类
+                if(tabPage && tabPage === currentPage) {
+                    tab.classList.add('active');
+                    anyActive = true;
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // 回退匹配：如果没有任何tab被激活，则根据可见文本或页面标题匹配"食堂"关键词
+            if(!anyActive) {
+                navTabs.forEach(tab => {
+                    const text = (tab.textContent || '').trim();
+                    if(text.startsWith('食堂') || (document.title && document.title.includes('食堂') && text.includes('食堂'))) {
+                        tab.classList.add('active');
+                        anyActive = true;
+                    }
+                });
+            }
+
+            console.log('校园食光食堂页面加载完成');
+        });
+
+        // 切换学校（示例）
+        function switchSchool(school) {
+            alert('已切换到：' + school + '（示例）');
+            // TODO：保存到 localStorage 或发送给后端
+        }
+
+        // 延迟加载并打开统一登录弹窗（从 login-modal.html 动态加载）
+        function ensureLoginModal(callback) {
+            if(document.getElementById('login-modal')) {
+                if(callback) callback();
+                return;
+            }
+            fetch('login-modal.html').then(r => r.text()).then(html => {
+                const container = document.createElement('div');
+                container.innerHTML = html;
+                document.body.appendChild(container);
+                if(callback) callback();
+            }).catch(err => {
+                console.error('加载登录弹窗失败', err);
+                alert('无法加载登录弹窗（示例）');
+            });
+        }
+
+        function openLoginModal() {
+            ensureLoginModal(function(){
+                const modal = document.getElementById('login-modal');
+                if(modal) modal.classList.remove('hidden');
+                // call render state if available
+                if(typeof renderLoginState === 'function') renderLoginState();
+            });
+        }
+
+        // 校园地图弹窗
+        function openCampusMap() {
+            const modal = document.getElementById('campus-map-modal');
+            if(modal) modal.classList.remove('hidden');
+        }
+        
+        function closeCampusMap() {
+            const modal = document.getElementById('campus-map-modal');
+            if(modal) modal.classList.add('hidden');
+        }
+        
+        // 食堂卡片点击（除了按钮区域）
+        document.addEventListener('click', function(e) {
+            const card = e.target.closest('.canteen-card');
+            if(card && !e.target.closest('a') && !e.target.closest('button')) {
+                const canteenName = card.querySelector('.canteen-name').textContent;
+                // 在实际项目中，这里会跳转到食堂详情页
+                window.location.href = `canteen-detail.html?name=${encodeURIComponent(canteenName)}`;
+            }
+        });
+    </script>
+</body>
+</html>

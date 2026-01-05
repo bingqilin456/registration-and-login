@@ -153,7 +153,6 @@
             color: var(--primary-color);
             border-bottom-color: var(--primary-color);
             font-weight: 500;
-            border-bottom-color: var(--primary-color);
         }
         
         .nav-tab i {
@@ -542,6 +541,7 @@
         
         /* 智能推荐 - 使用"我的"界面收藏卡片样式 */
         .section-title {
+            margin: 20px;
             font-size: 20px;
             margin-bottom: var(--spacing-medium);
             display: flex;
@@ -553,12 +553,8 @@
             color: var(--primary-color);
         }
         
-        .recommend-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: var(--spacing-large);
-            margin-bottom: var(--spacing-large);
-        }
+        .recommend-wrapper { overflow-x: auto; display: flex; gap: 15px; padding-bottom: 10px; margin-bottom: var(--spacing-large); }
+        .recommend-card { flex: 0 0 300px; }
         
         .recommend-card {
             background-color: white;
@@ -616,6 +612,10 @@
         }
         
         /* 食堂导航 - 使用卡片式设计 */
+        .canteen-nav-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px; }
+        .canteen-nav-header .area-filter { padding:6px 8px; border-radius:4px; border:1px solid var(--border-color); background:white; }
+        .map-btn { background:var(--primary-color); color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; gap:8px; }
+        .map-btn i { margin-right:4px; }
         .canteen-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -769,7 +769,7 @@
             font-size: 14px;
             transition: background-color 0.2s;
             text-decoration: none;
-            display: inline-block;
+            display: inline-block; 
             text-align: center;
         }
         
@@ -840,10 +840,16 @@
         .hidden {
             display: none !important;
         }
+        .modal { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); z-index:1000; }
+        .modal.hidden { display:none; }
+        .modal-content { background:white; border-radius:8px; padding:16px; width:90%; max-width:900px; position:relative; }
+        .modal-close { position:absolute; top:8px; right:8px; border:none; background:transparent; font-size:20px; cursor:pointer; }
         
         .active-tab {
             display: block;
         }
+        .school-selector select { padding:6px 8px; border-radius:4px; border:1px solid var(--border-color); background:white; }
+        .school-selector { margin-right:8px; display:inline-block; vertical-align:middle; }
         
         .text-red {
             color: var(--primary-color);
@@ -851,6 +857,106 @@
         
         .text-green {
             color: var(--status-open);
+        }
+        
+        /* 新增：今日特惠和排行榜区域样式 */
+        .discount-section, .ranking-section {
+            margin-top: var(--spacing-large);
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .discount-cards, .ranking-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-medium);
+            margin-top: var(--spacing-medium);
+        }
+        
+        .discount-item, .ranking-item {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            padding: var(--spacing-medium);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .discount-item:hover, .ranking-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .discount-badge {
+            background-color: #ff4d4f;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+        
+        .ranking-badge {
+            background-color: var(--rating-color);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .discount-name, .ranking-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .discount-price, .ranking-price {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .original-price {
+            color: var(--text-light);
+            text-decoration: line-through;
+            font-size: 13px;
+        }
+        
+        .current-price {
+            color: #ff4d4f;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .discount-info, .ranking-info {
+            color: var(--text-light);
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .discount-time, .ranking-score {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .discount-time i, .ranking-score i {
+            margin-right: 5px;
+        }
+        
+        /* 时间标签 */
+        .time-tag {
+            background-color: #fff7e6;
+            color: #fa8c16;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 5px;
         }
     </style>
 </head>
@@ -863,6 +969,13 @@
                 <span>校园食光</span>
             </div>
             <div class="nav-right">
+                <div class="school-selector">
+                    <select onchange="switchSchool(this.value)">
+                        <option>东莞理工学院</option>
+                        <option>广东科技学院</option>
+                    </select>
+                </div>
+                <div class="nav-item" onclick="ensureLoginModal(openLoginModal)">登录</div>
                 <div class="nav-item">消息</div>
                 <!-- <div class="nav-item">个人中心</div> -->
                 <div class="nav-item">退出</div>
@@ -873,21 +986,21 @@
     <!-- 主导航 - 已改为真正的超链接 -->
     <nav class="main-nav">
         <div class="nav-tabs">
-            <a href="#" class="nav-tab active">
+            <a href="用户"首页"界面.html" class="nav-tab">
                 <i class="fas fa-home"></i>首页
             </a>
-            <a href="community.html" class="nav-tab">
+            <a href="./用户"社区"界面.html" class="nav-tab">
                 <i class="fas fa-users"></i>社区
             </a>
-            <a href="canteen.html" class="nav-tab">
+            <a href="./用户"食堂"界面.html" class="nav-tab">
                 <i class="fas fa-store"></i>食堂
             </a>
-            <a href="./用户“我的”界面.html" class="nav-tab">
+            <a href="./用户"我的"界面.html" class="nav-tab">
                 <i class="fas fa-user"></i>我的
             </a>
-            <button class="ai-nav-btn" onclick="openAIChat(event)">
+            <a href="./用户"ai助手"界面.html" class="nav-tab">
                 <i class="fas fa-robot"></i>AI助手
-            </button>
+            </a>
         </div>
     </nav>
     
@@ -911,10 +1024,12 @@
                         <div class="ai-icon">
                             <i class="fas fa-robot"></i>
                         </div>
-                        <div>
-                            <div class="ai-title">AI美食助手</div>
-                            <div class="ai-subtitle">智能推荐，解决你的选择困难症</div>
-                        </div>
+                        <a href="./用户"ai助手"界面.html">
+                            <div>
+                                <div class="ai-title">AI美食助手</div>
+                                <div class="ai-subtitle">智能推荐，解决你的选择困难症</div>
+                            </div>                            
+                        </a>
                     </div>
                     
                     <div class="ai-features">
@@ -923,17 +1038,16 @@
                         <span class="ai-feature">智能排序</span>
                         <span class="ai-feature">实时库存</span>
                     </div>
-                    
-                    <button class="ai-button" onclick="openAIChat(event)">
+                    <a href="./用户"ai助手"界面.html" class="ai-button">
                         <i class="fas fa-comment"></i> 开始对话
-                    </button>
+                    </a>
                 </div>
                 
                 <!-- 快速入口 -->
                 <div class="quick-card">
                     <div class="quick-title">快速入口</div>
                     <div class="quick-grid">
-                        <a href="canteen.html" class="quick-item">
+                        <a href="#nearby-canteens" class="quick-item" onclick="scrollToSection('nearby-canteens', event)">
                             <div class="quick-icon">
                                 <i class="fas fa-store"></i>
                             </div>
@@ -945,13 +1059,13 @@
                             </div>
                             <div class="quick-label">热门菜品</div>
                         </a>
-                        <a href="discount.html" class="quick-item">
+                        <a href="#today-discount" class="quick-item" onclick="scrollToSection('today-discount', event)">
                             <div class="quick-icon">
                                 <i class="fas fa-tag"></i>
                             </div>
                             <div class="quick-label">今日特惠</div>
                         </a>
-                        <a href="ranking.html" class="quick-item">
+                        <a href="#ranking" class="quick-item" onclick="scrollToSection('ranking', event)">
                             <div class="quick-icon">
                                 <i class="fas fa-trophy"></i>
                             </div>
@@ -1069,7 +1183,7 @@
                 <i class="fas fa-thumbs-up"></i> 智能推荐
             </h2>
             
-            <div class="recommend-grid">
+            <div class="recommend-wrapper">
                 <!-- 推荐菜品1 -->
                 <div class="recommend-card">
                     <div class="recommend-img">烧鸭饭图片</div>
@@ -1120,10 +1234,23 @@
             </div>
             
             <!-- 食堂导航 -->
-            <h2 class="section-title">
+            <h2 id="nearby-canteens" class="section-title">
                 <i class="fas fa-store"></i> 附近食堂
             </h2>
-            
+
+            <!-- 食堂导航头部：区域筛选 + 校园地图按钮 -->
+            <div class="canteen-nav-header">
+                <div>
+                    <select class="area-filter" onchange="filterArea(this.value)">
+                        <option>教学区</option>
+                        <option>生活区</option>
+                    </select>
+                </div>
+                <div>
+                    <button class="map-btn" onclick="openCampusMap()"><i class="fas fa-map"></i> 校园地图</button>
+                </div>
+            </div>
+
             <div class="canteen-grid">
                 <!-- 第一食堂 -->
                 <div class="canteen-card">
@@ -1216,12 +1343,61 @@
                 </div>
             </div>
             
+            <!-- 今日特惠区域 -->
+            <h2 id="today-discount" class="section-title">
+                <i class="fas fa-tag"></i> 今日特惠
+            </h2>
+            
+            <div class="discount-cards">
+                <!-- 特惠1 -->
+                <div class="discount-item">
+                    <div class="discount-badge">8.5折</div>
+                    <h3 class="discount-name">烧鸭饭特惠套餐</h3>
+                    <div class="discount-price">
+                        <span class="original-price">¥18</span>
+                        <span class="current-price">¥15.3</span>
+                    </div>
+                    <div class="discount-info">第一食堂烧腊档，包含烧鸭饭+例汤</div>
+                    <div class="discount-time">
+                        <i class="fas fa-clock"></i> 仅限今日 11:00-14:00
+                    </div>
+                </div>
+                
+                <!-- 特惠2 -->
+                <div class="discount-item">
+                    <div class="discount-badge">买一送一</div>
+                    <h3 class="discount-name">豆浆油条套餐</h3>
+                    <div class="discount-price">
+                        <span class="original-price">¥8</span>
+                        <span class="current-price">¥8</span>
+                    </div>
+                    <div class="discount-info">第二食堂早餐档，买一份送一份</div>
+                    <div class="discount-time">
+                        <i class="fas fa-clock"></i> 仅限今日 6:30-9:00
+                    </div>
+                </div>
+                
+                <!-- 特惠3 -->
+                <div class="discount-item">
+                    <div class="discount-badge">7折</div>
+                    <h3 class="discount-name">麻辣香锅</h3>
+                    <div class="discount-price">
+                        <span class="original-price">¥25</span>
+                        <span class="current-price">¥17.5</span>
+                    </div>
+                    <div class="discount-info">第二食堂特色窗口，任意搭配</div>
+                    <div class="discount-time">
+                        <i class="fas fa-clock"></i> 仅限今日 17:00-19:00
+                    </div>
+                </div>
+            </div>
+            
             <!-- 热门菜品区域 -->
             <h2 id="hot-dishes" class="section-title">
                 <i class="fas fa-fire"></i> 热门菜品
             </h2>
             
-            <div class="recommend-grid">
+            <div class="recommend-wrapper">
                 <!-- 热门菜品1 -->
                 <div class="recommend-card">
                     <div class="recommend-img">肠粉图片</div>
@@ -1270,9 +1446,78 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 排行榜区域 -->
+            <h2 id="ranking" class="section-title">
+                <i class="fas fa-trophy"></i> 排行榜
+            </h2>
+            
+            <div class="ranking-cards">
+                <!-- 排行榜1 -->
+                <div class="ranking-item">
+                    <div class="ranking-badge">1</div>
+                    <h3 class="ranking-name">第一食堂烧鸭饭</h3>
+                    <div class="ranking-price">
+                        <span class="current-price">¥15</span>
+                    </div>
+                    <div class="ranking-info">松山湖校区 · 烧腊档</div>
+                    <div class="ranking-score">
+                        <i class="fas fa-star"></i> 4.8分 · 156人评价
+                    </div>
+                </div>
+                
+                <!-- 排行榜2 -->
+                <div class="ranking-item">
+                    <div class="ranking-badge">2</div>
+                    <h3 class="ranking-name">第二食堂麻辣烫</h3>
+                    <div class="ranking-price">
+                        <span class="current-price">¥12-25</span>
+                    </div>
+                    <div class="ranking-info">松山湖校区 · 特色窗口</div>
+                    <div class="ranking-score">
+                        <i class="fas fa-star"></i> 4.6分 · 128人评价
+                    </div>
+                </div>
+                
+                <!-- 排行榜3 -->
+                <div class="ranking-item">
+                    <div class="ranking-badge">3</div>
+                    <h3 class="ranking-name">莞城食堂鲜虾肠粉</h3>
+                    <div class="ranking-price">
+                        <span class="current-price">¥12</span>
+                    </div>
+                    <div class="ranking-info">莞城校区 · 早茶档</div>
+                    <div class="ranking-score">
+                        <i class="fas fa-star"></i> 4.8分 · 98人评价
+                    </div>
+                </div>
+                
+                <!-- 排行榜4 -->
+                <div class="ranking-item">
+                    <div class="ranking-badge">4</div>
+                    <h3 class="ranking-name">第三食堂腊味煲仔饭</h3>
+                    <div class="ranking-price">
+                        <span class="current-price">¥18</span>
+                    </div>
+                    <div class="ranking-info">松山湖校区 · 特色窗口</div>
+                    <div class="ranking-score">
+                        <i class="fas fa-star"></i> 4.7分 · 87人评价
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
+    <!-- 校园地图弹窗 -->
+    <div id="campus-map-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCampusMap()">×</button>
+            <div class="campus-map-container" style="height:70vh; display:flex; align-items:center; justify-content:center;">
+                <p>地图加载中（示例）</p>
+            </div>
+        </div>
+    </div>
+
     <!-- 页脚 -->
     <footer class="footer">
         <div class="container">
@@ -1371,8 +1616,24 @@
         // 推荐卡片点击
         document.querySelectorAll('.recommend-card').forEach(card => {
             card.addEventListener('click', function() {
-                // 在实际项目中，这里会跳转到菜品详情页
+                // 在实际项目中，这里会跳转到菜品详情页或打开菜品弹窗
                 alert('跳转到菜品详情弹窗...');
+            });
+        });
+        
+        // 今日特惠卡片点击
+        document.querySelectorAll('.discount-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const discountName = this.querySelector('.discount-name').textContent;
+                alert(`跳转到"${discountName}"特惠详情...`);
+            });
+        });
+        
+        // 排行榜卡片点击
+        document.querySelectorAll('.ranking-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const rankingName = this.querySelector('.ranking-name').textContent;
+                alert(`跳转到"${rankingName}"菜品详情...`);
             });
         });
         
@@ -1389,27 +1650,86 @@
             });
         });
         
-        // 页面加载时，根据当前URL设置主导航激活状态
+        // 页面加载时，根据当前URL设置主导航激活状态（增强：支持编码/本地路径与标题回退匹配）
         document.addEventListener('DOMContentLoaded', function() {
-            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const currentPage = decodeURIComponent((window.location.pathname.split('/').pop() || 'index.html'));
             const navTabs = document.querySelectorAll('.nav-tab');
-            
+            let anyActive = false;
+
             navTabs.forEach(tab => {
                 // 获取超链接的href
-                const href = tab.getAttribute('href');
-                if(href) {
-                    const tabPage = href.split('/').pop();
-                    // 如果是当前页面，添加active类
-                    if(tabPage === currentPage) {
-                        tab.classList.add('active');
-                    } else {
-                        tab.classList.remove('active');
-                    }
+                const href = tab.getAttribute('href') || '';
+                const tabPage = decodeURIComponent(href.split('/').pop() || '');
+                // 如果是当前页面，添加active类
+                if(tabPage && tabPage === currentPage) {
+                    tab.classList.add('active');
+                    anyActive = true;
+                } else {
+                    tab.classList.remove('active');
                 }
             });
-            
+
+            // 回退匹配：如果没有任何tab被激活，则根据可见文本或页面标题匹配"首页"关键词
+            if(!anyActive) {
+                navTabs.forEach(tab => {
+                    const text = (tab.textContent || '').trim();
+                    if(text.startsWith('首页') || (document.title && document.title.includes('首页') && text.includes('首页'))) {
+                        tab.classList.add('active');
+                        anyActive = true;
+                    }
+                });
+            }
+
             console.log('校园食光首页加载完成');
         });
+
+        // 食堂区域筛选（示例）
+        function filterArea(area) {
+            alert('筛选区域：' + area + '（示例）');
+            // TODO：根据 area 过滤 .canteen-card
+        }
+
+        // 打开校园地图弹窗（示例）
+        function openCampusMap() {
+            const modal = document.getElementById('campus-map-modal');
+            if(modal) modal.classList.remove('hidden');
+        }
+        function closeCampusMap() {
+            const modal = document.getElementById('campus-map-modal');
+            if(modal) modal.classList.add('hidden');
+        }
+
+        // 切换学校（示例）
+        function switchSchool(school) {
+            alert('已切换到：' + school + '（示例）');
+            // TODO：保存到 localStorage 或发送给后端
+        }
+
+        // 延迟加载并打开统一登录弹窗（从 login-modal.html 动态加载）
+        function ensureLoginModal(callback) {
+            if(document.getElementById('login-modal')) {
+                if(callback) callback();
+                return;
+            }
+            fetch('login-modal.html').then(r => r.text()).then(html => {
+                const container = document.createElement('div');
+                container.innerHTML = html;
+                document.body.appendChild(container);
+                if(callback) callback();
+            }).catch(err => {
+                console.error('加载登录弹窗失败', err);
+                alert('无法加载登录弹窗（示例）');
+            });
+        }
+
+        function openLoginModal() {
+            ensureLoginModal(function(){
+                const modal = document.getElementById('login-modal');
+                if(modal) modal.classList.remove('hidden');
+                // call render state if available
+                if(typeof renderLoginState === 'function') renderLoginState();
+            });
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区 - 校园食光</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 全局样式 - 遵循设计规范 */
+        :root {
+            --primary-color: #e60012; /* 大众点评红 */
+            --bg-gray: #f8f8f8; /* 背景灰 */
+            --border-color: #e5e5e5; /* 浅灰边框 */
+            --text-dark: #333; /* 深灰文字 */
+            --text-light: #999; /* 浅灰文字 */
+            --status-open: #52c41a; /* 营业中 */
+            --status-closed: #ff4d4f; /* 已关闭 */
+            --rating-color: #ffc107; /* 评分金色 */
+            --tag-blue: #1890ff; /* 标签蓝 */
+            --spacing-small: 8px;
+            --spacing-medium: 15px;
+            --spacing-large: 20px;
+            --border-radius: 4px;
+            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-gray);
+            color: var(--text-dark);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-large);
+        }
+        
+        /* 顶部导航栏 */
+        .global-nav {
+            background-color: var(--primary-color);
+            height: 45px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            color: white;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .logo i {
+            margin-right: 8px;
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-item {
+            margin-left: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            position: relative;
+            padding: 5px 0;
+        }
+        
+        .nav-item:hover {
+            opacity: 0.9;
+        }
+        
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: white;
+        }
+        
+        /* 主导航 - 改为超链接样式 */
+        .main-nav {
+            background-color: white;
+            height: 50px;
+            margin-top: 45px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            height: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 主导航项改为a标签样式 */
+        .nav-tab {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--text-dark);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            text-decoration: none; /* 移除下划线 */
+        }
+        
+        /* 悬停状态 */
+        .nav-tab:hover {
+            color: var(--primary-color);
+            text-decoration: none; /* 确保悬停时没有下划线 */
+        }
+        
+        /* 当前页面激活状态 */
+        .nav-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-tab i {
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        
+        /* AI助手特殊按钮样式 */
+        .ai-nav-btn {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--text-dark);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            background: none;
+            border: none;
+            font-family: inherit;
+            padding: 0;
+        }
+        
+        .ai-nav-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        /* 社区页面特有样式 */
+        .main-content {
+            margin-top: var(--spacing-large);
+            padding-bottom: 50px;
+        }
+        
+        /* 发布动态区域 */
+        .post-creator {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .post-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: var(--spacing-medium);
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+        
+        .post-input-container {
+            flex: 1;
+        }
+        
+        .post-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            resize: none;
+            height: 60px;
+        }
+        
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .action-icons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .action-icon {
+            display: flex;
+            align-items: center;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .action-icon:hover {
+            color: var(--primary-color);
+        }
+        
+        .action-icon i {
+            margin-right: 5px;
+            font-size: 16px;
+        }
+        
+        .post-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .post-btn:hover {
+            background-color: #d5000f;
+        }
+        
+        /* 社区筛选器 */
+        .community-filter {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+            padding: var(--spacing-medium);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .filter-tab {
+            padding: 8px 0;
+            cursor: pointer;
+            font-size: 15px;
+            color: var(--text-dark);
+            position: relative;
+        }
+        
+        .filter-tab:hover {
+            color: var(--primary-color);
+        }
+        
+        .filter-tab.active {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .filter-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .filter-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-dropdown {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            background-color: white;
+            font-size: 13px;
+            color: var(--text-dark);
+        }
+        
+        /* 热门话题 */
+        .hot-topics {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: var(--spacing-medium);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .section-more {
+            color: var(--text-light);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .section-more:hover {
+            color: var(--primary-color);
+        }
+        
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--spacing-medium);
+        }
+        
+        .topic-card {
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .topic-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .topic-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .topic-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f0f9ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            color: var(--tag-blue);
+        }
+        
+        .topic-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .topic-desc {
+            color: var(--text-light);
+            font-size: 13px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .topic-stats {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        /* 社区主内容布局 */
+        .community-content {
+            display: flex;
+            gap: var(--spacing-large);
+        }
+        
+        /* 动态流区域 */
+        .feed-area {
+            flex: 2;
+        }
+        
+        /* 动态卡片 - 与首页和"我的"界面一致 */
+        .dynamic-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .dynamic-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .card-header {
+            padding: var(--spacing-medium);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-user {
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .card-user-info h4 {
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+        
+        .card-user-info p {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        .card-time {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        .card-body {
+            padding: var(--spacing-medium);
+        }
+        
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .card-content {
+            color: var(--text-dark);
+            margin-bottom: var(--spacing-medium);
+            line-height: 1.6;
+        }
+        
+        .card-images {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .card-img {
+            height: 100px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: var(--spacing-medium);
+        }
+        
+        .card-tag {
+            background-color: #f5f5f5;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+        
+        .card-tag:hover {
+            background-color: #e9e9e9;
+        }
+        
+        .card-footer {
+            padding: var(--spacing-medium);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: var(--text-light);
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .action-btn i {
+            margin-right: 5px;
+            font-size: 14px;
+        }
+        
+        .card-stats {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            flex: 1;
+        }
+        
+        /* 活跃用户卡片 */
+        .active-users {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .user-list {
+            margin-top: var(--spacing-medium);
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .user-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .user-title {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        .user-follow {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+        
+        .user-follow:hover {
+            background-color: #d5000f;
+        }
+        
+        /* 社区规则卡片 */
+        .community-rules {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            box-shadow: var(--shadow-card);
+        }
+        
+        .rules-list {
+            margin-top: var(--spacing-medium);
+        }
+        
+        .rule-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .rule-item:last-child {
+            border-bottom: none;
+        }
+        
+        .rule-item i {
+            color: var(--primary-color);
+            margin-right: 8px;
+            margin-top: 2px;
+        }
+        
+        /* 热门菜品推荐 */
+        .hot-dishes {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-medium);
+            box-shadow: var(--shadow-card);
+            margin-bottom: var(--spacing-large);
+        }
+        
+        .dish-list {
+            margin-top: var(--spacing-medium);
+        }
+        
+        .dish-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+        }
+        
+        .dish-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dish-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 3px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        .dish-info {
+            flex: 1;
+        }
+        
+        .dish-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .dish-canteen {
+            color: var(--text-light);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .dish-rating {
+            color: var(--rating-color);
+            font-size: 12px;
+        }
+        
+        /* 校区标签 */
+        .campus-tag {
+            background-color: #f0f9ff;
+            color: var(--tag-blue);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+        
+        /* 高亮帖子 */
+        .highlight-card {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        /* 页脚 */
+        .footer {
+            background-color: white;
+            padding: var(--spacing-large) 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* AI悬浮按钮 */
+        .ai-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-color), #ff5252);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(230, 0, 18, 0.3);
+            z-index: 100;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .ai-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(230, 0, 18, 0.4);
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #d5000f;
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .community-content {
+                flex-direction: column;
+            }
+            
+            .topics-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--spacing-medium);
+            }
+            
+            .nav-tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .nav-tab, .ai-nav-btn {
+                min-width: 100px;
+                font-size: 14px;
+            }
+            
+            .community-filter {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .filter-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .topics-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .card-images {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-fab {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .post-actions {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+        
+        /* 工具类 */
+        .hidden {
+            display: none !important;
+        }
+        .modal { position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.5); z-index:1000; }
+        .modal.hidden { display:none; }
+        .modal-content { background:white; border-radius:8px; padding:16px; width:90%; max-width:900px; position:relative; }
+        .modal-close { position:absolute; top:8px; right:8px; border:none; background:transparent; font-size:20px; cursor:pointer; }
+        
+        .active-tab {
+            display: block;
+        }
+        
+        /* 统一校区选择器样式 */
+        .school-selector {
+            margin-right: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .school-selector select {
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+        
+        .text-red {
+            color: var(--primary-color);
+        }
+        
+        .text-green {
+            color: var(--status-open);
+        }
+        
+        /* 加载更多按钮 */
+        .load-more {
+            text-align: center;
+            margin-top: var(--spacing-large);
+        }
+        
+        .load-more-btn {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 3px;
+            padding: 10px 30px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .load-more-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* 评论区域 */
+        .comment-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f5f5f5;
+        }
+        
+        .comment-item {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .comment-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            color: var(--primary-color);
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        
+        .comment-content {
+            flex: 1;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .comment-author {
+            font-weight: 500;
+            font-size: 13px;
+        }
+        
+        .comment-time {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+        
+        .comment-text {
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .comment-action {
+            cursor: pointer;
+        }
+        
+        .comment-action:hover {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- 全局导航栏 -->
+    <nav class="global-nav">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-utensils"></i>
+                <span>校园食光</span>
+            </div>
+            <div class="nav-right">
+                <div class="school-selector">
+                    <select onchange="switchSchool(this.value)">
+                        <option>东莞理工学院</option>
+                        <option>广东科技学院</option>
+                    </select>
+                </div>
+                <div class="nav-item" onclick="ensureLoginModal(openLoginModal)">登录</div>
+                <div class="nav-item">消息</div>
+                <!-- <div class="nav-item">个人中心</div> -->
+                <div class="nav-item">退出</div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- 主导航 - 已改为真正的超链接 -->
+    <nav class="main-nav">
+        <div class="nav-tabs">
+            <a href="用户“首页”界面.html" class="nav-tab">
+                <i class="fas fa-home"></i>首页
+            </a>
+            <a href="./用户“社区”界面.html" class="nav-tab active">
+                <i class="fas fa-users"></i>社区
+            </a>
+            <a href="./用户“食堂”界面.html" class="nav-tab">
+                <i class="fas fa-store"></i>食堂
+            </a>
+            <a href="./用户“我的”界面.html" class="nav-tab">
+                <i class="fas fa-user"></i>我的
+            </a>
+            <a href="./用户“ai助手”界面.html" class="nav-tab">
+                <i class="fas fa-robot"></i>AI助手
+            </a>
+        </div>
+    </nav>
+    
+    <!-- 主内容区域 -->
+    <div class="container">
+        <div class="main-content">
+            <!-- 发布动态区域 -->
+            <div class="post-creator">
+                <div class="post-header">
+                    <div class="post-avatar">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="post-input-container">
+                        <textarea class="post-input" placeholder="分享你的美食体验，参与校园食光社区讨论..."></textarea>
+                        <div class="post-actions">
+                            <div class="action-icons">
+                                <div class="action-icon" onclick="addImage()">
+                                    <i class="fas fa-image"></i> 图片
+                                </div>
+                                <div class="action-icon" onclick="addTag()">
+                                    <i class="fas fa-tag"></i> 标签
+                                </div>
+                                <div class="action-icon" onclick="addLocation()">
+                                    <i class="fas fa-map-marker-alt"></i> 位置
+                                </div>
+                            </div>
+                            <button class="post-btn" onclick="createPost()">发布</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 社区筛选器 -->
+            <div class="community-filter">
+                <div class="filter-tabs">
+                    <div class="filter-tab active" onclick="changeFilter('recommended', this)">推荐</div>
+                    <div class="filter-tab" onclick="changeFilter('latest', this)">最新</div>
+                    <div class="filter-tab" onclick="changeFilter('hot', this)">热门</div>
+                    <div class="filter-tab" onclick="changeFilter('following', this)">关注</div>
+                </div>
+                <div class="filter-right">
+                    <select class="filter-dropdown" onchange="filterByCampus(this.value)">
+                        <option value="">全部校区</option>
+                        <option value="松山湖">松山湖校区</option>
+                        <option value="莞城">莞城校区</option>
+                    </select>
+                    <select class="filter-dropdown" onchange="filterByCanteen(this.value)">
+                        <option value="">全部食堂</option>
+                        <option value="第一食堂">第一食堂</option>
+                        <option value="第二食堂">第二食堂</option>
+                        <option value="第三食堂">第三食堂</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 热门话题 -->
+            <div class="hot-topics">
+                <div class="section-title">
+                    <div>
+                        <i class="fas fa-fire"></i> 热门话题
+                    </div>
+                    <div class="section-more" onclick="viewAllTopics()">查看全部</div>
+                </div>
+                <div class="topics-grid">
+                    <!-- 话题1 -->
+                    <div class="topic-card" onclick="viewTopic('食堂推荐')">
+                        <div class="topic-header">
+                            <div class="topic-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <div class="topic-name">食堂推荐</div>
+                        </div>
+                        <div class="topic-desc">分享你心目中的最佳食堂，帮助同学找到美食</div>
+                        <div class="topic-stats">
+                            <span>1.2k 讨论</span>
+                            <span>8.5k 浏览</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 话题2 -->
+                    <div class="topic-card" onclick="viewTopic('避雷指南')">
+                        <div class="topic-header">
+                            <div class="topic-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="topic-name">避雷指南</div>
+                        </div>
+                        <div class="topic-desc">分享踩坑经历，帮助同学避雷</div>
+                        <div class="topic-stats">
+                            <span>856 讨论</span>
+                            <span>6.3k 浏览</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 话题3 -->
+                    <div class="topic-card" onclick="viewTopic('新品测评')">
+                        <div class="topic-header">
+                            <div class="topic-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="topic-name">新品测评</div>
+                        </div>
+                        <div class="topic-desc">食堂新菜品抢先体验与评价</div>
+                        <div class="topic-stats">
+                            <span>523 讨论</span>
+                            <span>4.2k 浏览</span>
+                        </div>
+                    </div>
+                    
+                    <!-- 话题4 -->
+                    <div class="topic-card" onclick="viewTopic('健康饮食')">
+                        <div class="topic-header">
+                            <div class="topic-icon">
+                                <i class="fas fa-apple-alt"></i>
+                            </div>
+                            <div class="topic-name">健康饮食</div>
+                        </div>
+                        <div class="topic-desc">分享健康饮食搭配，追求营养均衡</div>
+                        <div class="topic-stats">
+                            <span>342 讨论</span>
+                            <span>3.8k 浏览</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 社区主内容布局 -->
+            <div class="community-content">
+                <!-- 动态流区域 -->
+                <div class="feed-area">
+                    <!-- 动态卡片1 -->
+                    <div class="dynamic-card highlight-card">
+                        <div class="card-header">
+                            <div class="card-user">
+                                <div class="card-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="card-user-info">
+                                    <h4>李同学</h4>
+                                    <p>东莞理工学院 · 计算机学院</p>
+                                </div>
+                            </div>
+                            <div class="card-time">2小时前</div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">第一食堂烧腊档的烧鸭饭真是绝了！<span class="campus-tag">松山湖校区</span></h3>
+                            <p class="card-content">今天尝试了第一食堂烧腊档的烧鸭饭，皮脆肉嫩，酱汁浓郁，搭配的青菜也很新鲜。价格实惠，只要15元，非常满足！强烈推荐给喜欢粤菜的同学。</p>
+                            
+                            <div class="card-images">
+                                <div class="card-img">烧鸭饭图片</div>
+                                <div class="card-img">烧腊档环境</div>
+                                <div class="card-img">价格单</div>
+                            </div>
+                            
+                            <div class="card-tags">
+                                <span class="card-tag" onclick="filterByTag('烧鸭饭')">#烧鸭饭</span>
+                                <span class="card-tag" onclick="filterByTag('第一食堂')">#第一食堂</span>
+                                <span class="card-tag" onclick="filterByTag('粤菜')">#粤菜</span>
+                                <span class="card-tag" onclick="filterByTag('性价比高')">#性价比高</span>
+                            </div>
+                            
+                            <!-- 评论区域 -->
+                            <div class="comment-section">
+                                <div class="comment-item">
+                                    <div class="comment-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="comment-content">
+                                        <div class="comment-header">
+                                            <div class="comment-author">王同学</div>
+                                            <div class="comment-time">1小时前</div>
+                                        </div>
+                                        <div class="comment-text">同感！烧鸭饭真的超好吃，特别是那个酱汁，拌饭一流！</div>
+                                        <div class="comment-actions">
+                                            <span class="comment-action">回复</span>
+                                            <span class="comment-action">点赞 5</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="comment-item">
+                                    <div class="comment-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="comment-content">
+                                        <div class="comment-header">
+                                            <div class="comment-author">张同学</div>
+                                            <div class="comment-time">30分钟前</div>
+                                        </div>
+                                        <div class="comment-text">请问几点去人比较少？上次排了好久的队。</div>
+                                        <div class="comment-actions">
+                                            <span class="comment-action">回复</span>
+                                            <span class="comment-action">点赞 2</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-actions">
+                                <div class="action-btn">
+                                    <i class="fas fa-thumbs-up"></i> 点赞 <span>32</span>
+                                </div>
+                                <div class="action-btn" onclick="toggleComments(this)">
+                                    <i class="fas fa-comment"></i> 评论 <span>12</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fas fa-share"></i> 分享
+                                </div>
+                            </div>
+                            <div class="card-stats">
+                                <span><i class="fas fa-eye"></i> 189 浏览</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 动态卡片2 -->
+                    <div class="dynamic-card">
+                        <div class="card-header">
+                            <div class="card-user">
+                                <div class="card-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="card-user-info">
+                                    <h4>王同学</h4>
+                                    <p>东莞理工学院 · 经济与管理学院</p>
+                                </div>
+                            </div>
+                            <div class="card-time">昨天</div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">第二食堂麻辣烫新品尝试<span class="campus-tag">松山湖校区</span></h3>
+                            <p class="card-content">今天去第二食堂尝试了新推出的麻辣烫，汤底有麻辣、酸辣、清汤三种可选，食材新鲜，种类丰富。特别推荐豆皮和牛肉丸，搭配酸辣汤底非常开胃！价格也比较实惠，人均15元左右。</p>
+                            
+                            <div class="card-images">
+                                <div class="card-img">麻辣烫图片</div>
+                                <div class="card-img">食材区</div>
+                            </div>
+                            
+                            <div class="card-tags">
+                                <span class="card-tag" onclick="filterByTag('麻辣烫')">#麻辣烫</span>
+                                <span class="card-tag" onclick="filterByTag('第二食堂')">#第二食堂</span>
+                                <span class="card-tag" onclick="filterByTag('新品尝试')">#新品尝试</span>
+                                <span class="card-tag" onclick="filterByTag('酸辣')">#酸辣</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-actions">
+                                <div class="action-btn">
+                                    <i class="fas fa-thumbs-up"></i> 点赞 <span>24</span>
+                                </div>
+                                <div class="action-btn" onclick="toggleComments(this)">
+                                    <i class="fas fa-comment"></i> 评论 <span>8</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fas fa-share"></i> 分享
+                                </div>
+                            </div>
+                            <div class="card-stats">
+                                <span><i class="fas fa-eye"></i> 142 浏览</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 动态卡片3 -->
+                    <div class="dynamic-card">
+                        <div class="card-header">
+                            <div class="card-user">
+                                <div class="card-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="card-user-info">
+                                    <h4>陈同学</h4>
+                                    <p>东莞理工学院 · 机械工程学院</p>
+                                </div>
+                            </div>
+                            <div class="card-time">3天前</div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">寻找早餐搭子，一起去莞城食堂吃肠粉！<span class="campus-tag">莞城校区</span></h3>
+                            <p class="card-content">有没有住在莞城校区5栋的同学，想找个早餐搭子，每天早上7:30一起去莞城食堂吃肠粉。一个人吃早餐太无聊了，有同学一起的话可以尝试更多种类，互相分享。</p>
+                            
+                            <div class="card-tags">
+                                <span class="card-tag" onclick="filterByTag('早餐搭子')">#早餐搭子</span>
+                                <span class="card-tag" onclick="filterByTag('莞城食堂')">#莞城食堂</span>
+                                <span class="card-tag" onclick="filterByTag('肠粉')">#肠粉</span>
+                                <span class="card-tag" onclick="filterByTag('社交')">#社交</span>
+                            </div>
+                            
+                            <!-- 评论区域 -->
+                            <div class="comment-section hidden">
+                                <div class="comment-item">
+                                    <div class="comment-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="comment-content">
+                                        <div class="comment-header">
+                                            <div class="comment-author">刘同学</div>
+                                            <div class="comment-time">2天前</div>
+                                        </div>
+                                        <div class="comment-text">我住6栋的，也想找人一起吃早餐！加个微信？</div>
+                                        <div class="comment-actions">
+                                            <span class="comment-action">回复</span>
+                                            <span class="comment-action">点赞 3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-actions">
+                                <div class="action-btn">
+                                    <i class="fas fa-thumbs-up"></i> 点赞 <span>18</span>
+                                </div>
+                                <div class="action-btn" onclick="toggleComments(this)">
+                                    <i class="fas fa-comment"></i> 评论 <span>5</span>
+                                </div>
+                                <div class="action-btn">
+                                    <i class="fas fa-share"></i> 分享
+                                </div>
+                            </div>
+                            <div class="card-stats">
+                                <span><i class="fas fa-eye"></i> 89 浏览</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 加载更多 -->
+                    <div class="load-more">
+                        <button class="load-more-btn" onclick="loadMorePosts()">加载更多动态</button>
+                    </div>
+                </div>
+                
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <!-- 活跃用户卡片 -->
+                    <div class="active-users">
+                        <div class="section-title">
+                            <div>
+                                <i class="fas fa-users"></i> 活跃用户
+                            </div>
+                            <div class="section-more" onclick="viewAllUsers()">查看全部</div>
+                        </div>
+                        <div class="user-list">
+                            <div class="user-item">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">美食家小李</div>
+                                    <div class="user-title">校园美食家 · 发布128条动态</div>
+                                </div>
+                                <button class="user-follow">关注</button>
+                            </div>
+                            
+                            <div class="user-item">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">食堂测评师</div>
+                                    <div class="user-title">食堂测评达人 · 发布96条动态</div>
+                                </div>
+                                <button class="user-follow">关注</button>
+                            </div>
+                            
+                            <div class="user-item">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">健康饮食王</div>
+                                    <div class="user-title">健康饮食倡导者 · 发布72条动态</div>
+                                </div>
+                                <button class="user-follow">已关注</button>
+                            </div>
+                            
+                            <div class="user-item">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name">早餐探索者</div>
+                                    <div class="user-title">早餐达人 · 发布56条动态</div>
+                                </div>
+                                <button class="user-follow">关注</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 热门菜品推荐 -->
+                    <div class="hot-dishes">
+                        <div class="section-title">
+                            <div>
+                                <i class="fas fa-utensils"></i> 热门菜品
+                            </div>
+                            <div class="section-more" onclick="viewAllDishes()">更多</div>
+                        </div>
+                        <div class="dish-list">
+                            <div class="dish-item" onclick="goToDishDetail('烧鸭饭')">
+                                <div class="dish-img">烧鸭饭</div>
+                                <div class="dish-info">
+                                    <div class="dish-name">烧鸭饭</div>
+                                    <div class="dish-canteen">第一食堂</div>
+                                    <div class="dish-rating"><i class="fas fa-star"></i> 4.8</div>
+                                </div>
+                            </div>
+                            
+                            <div class="dish-item" onclick="goToDishDetail('麻辣烫')">
+                                <div class="dish-img">麻辣烫</div>
+                                <div class="dish-info">
+                                    <div class="dish-name">麻辣烫</div>
+                                    <div class="dish-canteen">第二食堂</div>
+                                    <div class="dish-rating"><i class="fas fa-star"></i> 4.6</div>
+                                </div>
+                            </div>
+                            
+                            <div class="dish-item" onclick="goToDishDetail('肠粉')">
+                                <div class="dish-img">肠粉</div>
+                                <div class="dish-info">
+                                    <div class="dish-name">鲜虾肠粉</div>
+                                    <div class="dish-canteen">莞城食堂</div>
+                                    <div class="dish-rating"><i class="fas fa-star"></i> 4.8</div>
+                                </div>
+                            </div>
+                            
+                            <div class="dish-item" onclick="goToDishDetail('牛肉面')">
+                                <div class="dish-img">牛肉面</div>
+                                <div class="dish-info">
+                                    <div class="dish-name">牛肉面</div>
+                                    <div class="dish-canteen">第一食堂</div>
+                                    <div class="dish-rating"><i class="fas fa-star"></i> 4.5</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 社区规则卡片 -->
+                    <div class="community-rules">
+                        <div class="section-title">
+                            <div>
+                                <i class="fas fa-clipboard-list"></i> 社区规则
+                            </div>
+                        </div>
+                        <div class="rules-list">
+                            <div class="rule-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>友善交流，尊重他人观点</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>发布真实体验，避免虚假信息</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>图片清晰，内容与食堂相关</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>禁止广告、重复刷屏等行为</span>
+                            </div>
+                            <div class="rule-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>发现违规内容可点击举报</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 校园地图弹窗 -->
+    <div id="campus-map-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCampusMap()">×</button>
+            <div class="campus-map-container" style="height:70vh; display:flex; align-items:center; justify-content:center;">
+                <p>地图加载中（示例）</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <p>校园食光 - 多校AI美食社区平台</p>
+            <p>平台域名：campusfood.cn | © 2025 校园食光 版权所有</p>
+        </div>
+    </footer>
+    
+    <!-- AI悬浮按钮 -->
+    <div class="ai-fab" onclick="openAIChat(event)">
+        <i class="fas fa-robot"></i>
+    </div>
+    
+    <script>
+        // 主导航现在已经是超链接，不需要JavaScript处理跳转
+        // 只需要为AI助手按钮添加事件
+        
+        // 打开AI对话
+        function openAIChat(event) {
+            if(event) event.preventDefault();
+            alert('打开AI对话弹窗...');
+            // 实际项目中，这里会打开一个模态对话框
+        }
+        
+        // 发布动态功能
+        function createPost() {
+            const postInput = document.querySelector('.post-input');
+            const content = postInput.value.trim();
+            
+            if(!content) {
+                alert('请输入动态内容');
+                return;
+            }
+            
+            alert('发布动态成功！');
+            postInput.value = '';
+            
+            // 在实际项目中，这里会发送AJAX请求到服务器
+        }
+        
+        // 添加图片功能
+        function addImage() {
+            alert('打开图片选择器...');
+        }
+        
+        // 添加标签功能
+        function addTag() {
+            const tag = prompt('请输入标签名称（例如：#烧鸭饭）：');
+            if(tag) {
+                const postInput = document.querySelector('.post-input');
+                postInput.value += ` ${tag}`;
+            }
+        }
+        
+        // 添加位置功能
+        function addLocation() {
+            alert('打开位置选择器...');
+        }
+        
+        // 社区筛选器切换
+        function changeFilter(filter, element) {
+            // 更新激活状态
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            // 这里可以根据筛选器加载不同的内容
+            console.log(`切换到${filter}动态`);
+            // 实际项目中，这里会通过AJAX加载对应筛选器的内容
+        }
+        
+        // 按校区筛选
+        function filterByCampus(campus) {
+            if(campus) {
+                console.log(`筛选校区：${campus}`);
+                // 在实际项目中，这里会通过AJAX加载对应校区的动态
+            }
+        }
+        
+        // 按食堂筛选
+        function filterByCanteen(canteen) {
+            if(canteen) {
+                console.log(`筛选食堂：${canteen}`);
+                // 在实际项目中，这里会通过AJAX加载对应食堂的动态
+            }
+        }
+        
+        // 按标签筛选
+        function filterByTag(tag) {
+            console.log(`筛选标签：${tag}`);
+            // 在实际项目中，这里会跳转到标签页面或筛选对应标签的动态
+            alert(`正在筛选包含"${tag}"标签的动态...`);
+        }
+        
+        // 点赞功能
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // 阻止事件冒泡，避免触发其他事件
+                e.stopPropagation();
+                
+                const icon = this.querySelector('i');
+                if(icon.classList.contains('fa-thumbs-up')) {
+                    // 点赞功能
+                    const countSpan = this.querySelector('span');
+                    let count = parseInt(countSpan.textContent);
+                    if(!this.classList.contains('liked')) {
+                        count++;
+                        this.classList.add('liked');
+                        icon.style.color = 'var(--primary-color)';
+                    } else {
+                        count--;
+                        this.classList.remove('liked');
+                        icon.style.color = '';
+                    }
+                    countSpan.textContent = count;
+                } else if(icon.classList.contains('fa-share')) {
+                    // 分享功能
+                    alert('生成分享海报...');
+                }
+            });
+        });
+        
+        // 查看话题详情
+        function viewTopic(topicName) {
+            alert(`查看"${topicName}"话题详情...`);
+            // 在实际项目中，这里会跳转到话题详情页
+        }
+        
+        // 查看全部话题
+        function viewAllTopics() {
+            alert('查看全部话题...');
+        }
+        
+        // 查看全部用户
+        function viewAllUsers() {
+            alert('查看全部活跃用户...');
+        }
+        
+        // 查看全部菜品
+        function viewAllDishes() {
+            alert('查看全部热门菜品...');
+        }
+        
+        // 跳转到菜品详情
+        function goToDishDetail(dishName) {
+            alert(`跳转到"${dishName}"菜品详情...`);
+            // 在实际项目中，这里会跳转到菜品详情页
+        }
+        
+        // 关注用户
+        document.querySelectorAll('.user-follow').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if(this.textContent === '关注') {
+                    this.textContent = '已关注';
+                    this.style.backgroundColor = '#f0f0f0';
+                    this.style.color = '#666';
+                } else {
+                    this.textContent = '关注';
+                    this.style.backgroundColor = '';
+                    this.style.color = '';
+                }
+            });
+        });
+        
+        // 切换评论显示/隐藏
+        function toggleComments(btn) {
+            const card = btn.closest('.dynamic-card');
+            const commentSection = card.querySelector('.comment-section');
+            
+            if(commentSection) {
+                commentSection.classList.toggle('hidden');
+                
+                // 更新按钮文本
+                const commentSpan = btn.querySelector('span');
+                if(commentSection.classList.contains('hidden')) {
+                    btn.style.color = '';
+                } else {
+                    btn.style.color = 'var(--primary-color)';
+                }
+            }
+        }
+        
+        // 加载更多帖子
+        function loadMorePosts() {
+            alert('加载更多动态...');
+            // 在实际项目中，这里会通过AJAX加载更多动态
+        }
+        
+        // 页面加载时，根据当前URL设置主导航激活状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = decodeURIComponent((window.location.pathname.split('/').pop() || 'index.html'));
+            const navTabs = document.querySelectorAll('.nav-tab');
+            let anyActive = false;
+
+            navTabs.forEach(tab => {
+                // 获取超链接的href
+                const href = tab.getAttribute('href') || '';
+                const tabPage = decodeURIComponent(href.split('/').pop() || '');
+                // 如果是当前页面，添加active类
+                if(tabPage && tabPage === currentPage) {
+                    tab.classList.add('active');
+                    anyActive = true;
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // 回退匹配：如果没有任何tab被激活，则根据可见文本或页面标题匹配"社区"关键词
+            if(!anyActive) {
+                navTabs.forEach(tab => {
+                    const text = (tab.textContent || '').trim();
+                    if(text.startsWith('社区') || (document.title && document.title.includes('社区') && text.includes('社区'))) {
+                        tab.classList.add('active');
+                        anyActive = true;
+                    }
+                });
+            }
+
+            console.log('校园食光社区页面加载完成');
+        });
+
+        // 切换学校（示例）
+        function switchSchool(school) {
+            alert('已切换到：' + school + '（示例）');
+            // TODO：保存到 localStorage 或发送给后端
+        }
+
+        // 延迟加载并打开统一登录弹窗（从 login-modal.html 动态加载）
+        function ensureLoginModal(callback) {
+            if(document.getElementById('login-modal')) {
+                if(callback) callback();
+                return;
+            }
+            fetch('login-modal.html').then(r => r.text()).then(html => {
+                const container = document.createElement('div');
+                container.innerHTML = html;
+                document.body.appendChild(container);
+                if(callback) callback();
+            }).catch(err => {
+                console.error('加载登录弹窗失败', err);
+                alert('无法加载登录弹窗（示例）');
+            });
+        }
+
+        function openLoginModal() {
+            ensureLoginModal(function(){
+                const modal = document.getElementById('login-modal');
+                if(modal) modal.classList.remove('hidden');
+                // call render state if available
+                if(typeof renderLoginState === 'function') renderLoginState();
+            });
+        }
+
+        // 校园地图弹窗
+        function openCampusMap() {
+            const modal = document.getElementById('campus-map-modal');
+            if(modal) modal.classList.remove('hidden');
+        }
+        function closeCampusMap() {
+            const modal = document.getElementById('campus-map-modal');
+            if(modal) modal.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
