@@ -331,6 +331,33 @@
             font-size: 12px;
         }
         
+        /* 管理员专属样式 */
+        .admin-badge {
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+            font-weight: normal;
+        }
+        
+        .admin-menu-item {
+            background-color: rgba(230, 0, 18, 0.05);
+            border-left: 3px solid var(--primary-color);
+            margin-top: 10px;
+        }
+        
+        .admin-menu-item .menu-icon {
+            background-color: rgba(230, 0, 18, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .admin-menu-item .menu-text {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
         /* 主内容区 */
         .content-area {
             flex: 1;
@@ -812,8 +839,6 @@
         .active-tab {
             display: block;
         }
-        .admin-only { display: none; }
-        .admin-only .menu-text { color: var(--primary-color); font-weight:600; }
         
         /* 统一校区选择器样式（与首页保持一致） */
         .school-selector {
@@ -834,6 +859,34 @@
         
         .text-green {
             color: var(--status-open);
+        }
+        
+        /* 管理员模式切换提示 */
+        .admin-mode-notice {
+            background-color: rgba(230, 0, 18, 0.1);
+            border: 1px solid rgba(230, 0, 18, 0.3);
+            border-radius: var(--border-radius);
+            padding: 12px 16px;
+            margin-bottom: var(--spacing-large);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .admin-mode-notice .notice-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .admin-mode-notice .admin-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -863,19 +916,19 @@
     <!-- 主导航 - 已改为真正的超链接 -->
     <nav class="main-nav">
         <div class="nav-tabs">
-            <a href="用户“首页”界面.html" class="nav-tab">
+            <a href="../用户/用户“首页”界面.html" class="nav-tab">
                 <i class="fas fa-home"></i>首页
             </a>
-            <a href="./用户“社区”界面.html" class="nav-tab">
+            <a href="../用户/用户“社区”界面.html" class="nav-tab">
                 <i class="fas fa-users"></i>社区
             </a>
-            <a href="./用户“食堂”界面.html" class="nav-tab">
+            <a href="../用户/用户“食堂”界面.html" class="nav-tab">
                 <i class="fas fa-store"></i>食堂
             </a>
-            <a href="用户“我的”界面.html" class="nav-tab active">
+            <a href="#" class="nav-tab active">
                 <i class="fas fa-user"></i>我的
             </a>
-            <a href="./用户“ai助手”界面.html" class="nav-tab">
+            <a href="../用户/用户“ai助手”界面.html" class="nav-tab">
                 <i class="fas fa-robot"></i>AI助手
             </a>
         </div>
@@ -883,6 +936,18 @@
     
     <!-- 主内容区域 -->
     <div class="container">
+        <!-- 管理员模式提示 -->
+        <div id="admin-mode-notice" class="admin-mode-notice hidden">
+            <div class="notice-text">
+                <i class="fas fa-user-shield"></i>
+                <span>您正在以管理员身份浏览普通用户界面</span>
+                <span class="admin-badge">管理员</span>
+            </div>
+            <button class="btn" onclick="enterWorkbench()">
+                <i class="fas fa-cubes"></i> 进入工作台
+            </button>
+        </div>
+        
         <div class="main-content">
             <!-- 侧边栏 -->
             <div class="sidebar">
@@ -893,7 +958,7 @@
                             <i class="fas fa-user-graduate"></i>
                         </div>
                         <div class="user-info">
-                            <h3>张同学</h3>
+                            <h3 id="username">张同学</h3>
                             <p>东莞理工学院 · 计算机科学与技术学院（松山湖校区）</p>
                             <p><i class="fas fa-star" style="color: #ffc107;"></i> 食光等级：Lv.8</p>
                         </div>
@@ -924,18 +989,14 @@
                             <div class="menu-text">我的收藏</div>
                             <div class="menu-badge">12</div>
                         </div>
-                        <div class="menu-item admin-only" data-section="workbench">
-                            <div class="menu-icon">
-                                <i class="fas fa-cubes"></i>
-                            </div>
-                            <div class="menu-text">进入工作台</div>
-                        </div>
+                        
                         <div class="menu-item" data-section="footprint">
                             <div class="menu-icon">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
                             <div class="menu-text">我的足迹</div>
                         </div>
+                        
                         <div class="menu-item" data-section="ai-chat-history">
                             <div class="menu-icon">
                                 <i class="fas fa-comments"></i>
@@ -949,11 +1010,20 @@
                             </div>
                             <div class="menu-text">浏览历史</div>
                         </div>
+                        
                         <div class="menu-item">
                             <div class="menu-icon">
                                 <i class="fas fa-cog"></i>
                             </div>
                             <div class="menu-text">设置</div>
+                        </div>
+                        
+                        <!-- 管理员工作台入口 -->
+                        <div id="admin-workbench-item" class="menu-item admin-menu-item" onclick="enterWorkbench()">
+                            <div class="menu-icon">
+                                <i class="fas fa-cubes"></i>
+                            </div>
+                            <div class="menu-text">进入工作台</div>
                         </div>
                     </div>
                 </div>
@@ -1157,7 +1227,7 @@
                         </div>
                     </div>
 
-                    <!-- AI饮食报告（作为我的足迹下的子模块） -->
+                    <!-- AI饮食报告 -->
                     <div class="dynamic-card">
                         <div class="card-body">
                             <h3 class="card-title">AI饮食报告（数据分析）</h3>
@@ -1180,24 +1250,6 @@
                                 </div>
                             </div>
                             <div style="margin-top:12px;">根据您的饮食记录分析，您对辣味食品的偏好明显（占比65%），建议适当增加蔬菜和清淡食物的摄入。推荐尝试莞城食堂的蔬菜沙拉和松山湖第二食堂的蒸菜系列，以达到更均衡的饮食结构。</div>
-                        </div>
-                    </div>
-                            <p style="margin-bottom: 10px; color: var(--text-light); font-size: 13px;">根据您的浏览记录生成</p>
-                            
-                            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                                <span style="background-color: #f5f5f5; padding: 5px 10px; border-radius: 3px; font-size: 13px;">
-                                    <i class="fas fa-store" style="margin-right: 5px;"></i>松山湖第一食堂
-                                </span>
-                                <span style="background-color: #f5f5f5; padding: 5px 10px; border-radius: 3px; font-size: 13px;">
-                                    <i class="fas fa-utensils" style="margin-right: 5px;"></i>麻辣香锅
-                                </span>
-                                <span style="background-color: #f5f5f5; padding: 5px 10px; border-radius: 3px; font-size: 13px;">
-                                    <i class="fas fa-store" style="margin-right: 5px;"></i>松山湖第二食堂
-                                </span>
-                                <span style="background-color: #f5f5f5; padding: 5px 10px; border-radius: 3px; font-size: 13px;">
-                                    <i class="fas fa-utensils" style="margin-right: 5px;"></i>豆浆油条
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1232,8 +1284,6 @@
                         </button>
                     </div>
                 </div>
-                
-
             </div>
         </div>
     </div>
@@ -1262,6 +1312,38 @@
     </div>
     
     <script>
+        // 页面加载时检查用户角色
+        document.addEventListener('DOMContentLoaded', function() {
+            // 开发默认：若未设置身份，先设置为管理员（便于本地验证）
+            if(!localStorage.getItem('userRole')){ try{ localStorage.setItem('userRole','admin'); }catch(e){} }
+
+            // 检查用户角色
+            const userRole = localStorage.getItem('userRole');
+            const adminNotice = document.getElementById('admin-mode-notice');
+            const adminMenuItem = document.getElementById('admin-workbench-item');
+            const username = document.getElementById('username');
+            
+            // 如果是管理员，显示管理员相关元素
+            if (userRole === 'admin') {
+                if (adminNotice) adminNotice.classList.remove('hidden');
+                if (adminMenuItem) adminMenuItem.classList.remove('hidden');
+                if (username) username.innerHTML = '张老师 <span class="admin-badge">管理员</span>';
+                // 也把顶部统一提示去除，避免与全局注入重复
+                const global = document.getElementById('admin-mode-notice-global'); if(global) global.remove();
+            }
+            
+            // 默认显示我的动态
+            document.getElementById('my-dynamics').classList.remove('hidden');
+            
+            console.log('校园食光个人中心加载完成，用户角色：', userRole || '普通用户');
+        });
+        
+        // 进入工作台
+        function enterWorkbench() {
+            // 跳转到管理员工作台（父目录下的 管理员 文件夹）
+            window.location.href = '../管理员/管理员首页.html';
+        }
+        
         // 打开AI对话
         function openAIChat(event) {
             if(event) event.preventDefault();
@@ -1329,8 +1411,8 @@
             });
         });
         
-        // 侧边栏菜单切换
-        document.querySelectorAll('.menu-item').forEach(item => {
+        // 侧边栏菜单切换（普通菜单项）
+        document.querySelectorAll('.menu-item:not(.admin-menu-item)').forEach(item => {
             item.addEventListener('click', function() {
                 const section = this.getAttribute('data-section');
                 if(section) {
@@ -1345,23 +1427,7 @@
                 }
             });
         });
-
-        // 管理员菜单项点击 - 显示工作台（示例）
-        const adminItems = document.querySelectorAll('.menu-item.admin-only');
-        if(adminItems.length) {
-            adminItems.forEach(it => {
-                it.addEventListener('click', function() {
-                    alert('进入管理员工作台（示例）');
-                });
-            });
-        }
         
-        // 初始化显示我的动态
-        document.addEventListener('DOMContentLoaded', function() {
-            // 默认显示我的动态
-            document.getElementById('my-dynamics').classList.remove('hidden');
-        });
-
         // 切换学校（示例）
         function switchSchool(school) {
             alert('已切换到：' + school + '（示例）');

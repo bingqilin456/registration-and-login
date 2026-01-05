@@ -181,7 +181,9 @@
             
             // 模拟登录成功
             alert('管理员登录成功！即将跳转到管理后台');
-            // window.location.href = 'admin-dashboard.html';
+            try{ localStorage.setItem('userRole','admin'); }catch(e){}
+            // 跳转到管理员首页（从 注册及登录 目录到 主界面/管理员）
+            window.location.href = '../主界面/管理员/管理员首页.html';
         });
     </script>
 </body>

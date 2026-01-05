@@ -219,7 +219,9 @@
             
             // 模拟登录成功
             alert('登录成功！即将跳转到首页');
-            // window.location.href = 'user-home.html';
+            try{ localStorage.setItem('userRole','user'); }catch(e){}
+            // 跳转到用户首页（从 注册及登录 目录到 主界面/用户）
+            window.location.href = '../主界面/用户/用户“首页”界面.html';
         });
     </script>
 </body>

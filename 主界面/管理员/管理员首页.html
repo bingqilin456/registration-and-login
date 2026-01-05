@@ -488,35 +488,10 @@
             color: var(--primary-color);
         }
         
-        /* 退出登录 */
-        .logout-section {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 40px;
-            padding-top: var(--spacing-medium);
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .logout-btn {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            border-radius: 3px;
-            padding: 8px 20px;
-            font-size: 14px;
+        /* 退出工作台样式已集中到 navbar.js 注入，避免重复 */
+            margin-top: 15px;
             color: var(--text-light);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: all 0.3s;
-        }
-        
-        .logout-btn:hover {
-            border-color: var(--status-closed);
-            color: var(--status-closed);
-        }
-        
-        .logout-btn i {
-            margin-right: 5px;
+            font-size: 13px;
         }
         
         /* 响应式调整 */
@@ -546,6 +521,11 @@
                 padding: 0 15px;
                 font-size: 14px;
             }
+        }
+        
+        /* 工具类 */
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -591,7 +571,7 @@
         <!-- 页面标题 -->
         <div class="page-header">
             <h1 class="page-title">
-                <i class="fas fa-tachometer-alt"></i> 管理员控制台
+                <i class="fas fa-tachometer-alt"></i> 管理员工作台
             </h1>
             <p class="page-subtitle">实时监控平台数据，快速处理管理任务</p>
         </div>
@@ -646,28 +626,28 @@
         <section class="quick-actions">
             <h2 class="section-title">快捷操作入口</h2>
             <div class="actions-grid">
-                <div class="action-card">
+                <div class="action-card" onclick="openQuickAction('scan')">
                     <div class="action-icon">
                         <i class="fas fa-qrcode"></i>
                     </div>
                     <div class="action-title">扫码快速录入</div>
                 </div>
                 
-                <div class="action-card">
+                <div class="action-card" onclick="openQuickAction('excel')">
                     <div class="action-icon">
                         <i class="fas fa-file-excel"></i>
                     </div>
                     <div class="action-title">Excel批量导入</div>
                 </div>
                 
-                <div class="action-card">
+                <div class="action-card" onclick="openQuickAction('edit')">
                     <div class="action-icon">
                         <i class="fas fa-edit"></i>
                     </div>
                     <div class="action-title">批量编辑操作</div>
                 </div>
                 
-                <div class="action-card">
+                <div class="action-card" onclick="openQuickAction('schedule')">
                     <div class="action-icon">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
@@ -695,7 +675,7 @@
                                 <div class="task-desc">包含1条负面评价需要优先处理</div>
                                 <div class="task-time">10分钟前</div>
                             </div>
-                            <div class="task-action">去处理</div>
+                            <div class="task-action" onclick="handleTask('review')">去处理</div>
                         </li>
                         
                         <li class="task-item">
@@ -707,7 +687,7 @@
                                 <div class="task-desc">菜品库存不足，需要及时补充</div>
                                 <div class="task-time">30分钟前</div>
                             </div>
-                            <div class="task-action">去处理</div>
+                            <div class="task-action" onclick="handleTask('menu')">去处理</div>
                         </li>
                         
                         <li class="task-item">
@@ -719,7 +699,7 @@
                                 <div class="task-desc">根据假期安排更新营业时间</div>
                                 <div class="task-time">1小时前</div>
                             </div>
-                            <div class="task-action">去处理</div>
+                            <div class="task-action" onclick="handleTask('hours')">去处理</div>
                         </li>
                         
                         <li class="task-item">
@@ -731,7 +711,7 @@
                                 <div class="task-desc">检测到价格波动超出正常范围</div>
                                 <div class="task-time">2小时前</div>
                             </div>
-                            <div class="task-action">去处理</div>
+                            <div class="task-action" onclick="handleTask('price')">去处理</div>
                         </li>
                     </ul>
                 </div>
@@ -753,7 +733,7 @@
                                 <div class="canteen-name">第一食堂</div>
                                 <span class="status-tag status-open">营业中</span>
                             </div>
-                            <button class="edit-btn">编辑</button>
+                            <button class="edit-btn" onclick="editCanteen('第一食堂')">编辑</button>
                         </div>
                         
                         <div class="canteen-item">
@@ -764,7 +744,7 @@
                                 <div class="canteen-name">第二食堂</div>
                                 <span class="status-tag status-open">营业中</span>
                             </div>
-                            <button class="edit-btn">编辑</button>
+                            <button class="edit-btn" onclick="editCanteen('第二食堂')">编辑</button>
                         </div>
                         
                         <div class="canteen-item">
@@ -775,56 +755,22 @@
                                 <div class="canteen-name">第三食堂</div>
                                 <span class="status-tag status-closed">已关闭</span>
                             </div>
-                            <button class="edit-btn">编辑</button>
+                            <button class="edit-btn" onclick="editCanteen('第三食堂')">编辑</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- 退出登录 -->
-        <div class="logout-section">
-            <button class="logout-btn">
-                <i class="fas fa-sign-out-alt"></i> 退出登录
-            </button>
-        </div>
+
+
     </main>
     
     <script>
+        // 设置管理员身份标识
+        localStorage.setItem('userRole', 'admin');
+        
         // 简单的交互功能
         document.addEventListener('DOMContentLoaded', function() {
-            // 编辑按钮点击事件
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const canteenName = this.closest('.canteen-item').querySelector('.canteen-name').textContent;
-                    alert(`即将编辑 ${canteenName} 的信息`);
-                });
-            });
-            
-            // 任务操作点击事件
-            document.querySelectorAll('.task-action').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const taskTitle = this.closest('.task-item').querySelector('.task-title').textContent;
-                    alert(`处理任务: ${taskTitle}`);
-                });
-            });
-            
-            // 快捷操作卡片点击事件
-            document.querySelectorAll('.action-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    const actionTitle = this.querySelector('.action-title').textContent;
-                    alert(`执行操作: ${actionTitle}`);
-                });
-            });
-            
-            // 退出登录按钮点击事件
-            document.querySelector('.logout-btn').addEventListener('click', function() {
-                if (confirm('确定要退出登录吗？')) {
-                    alert('已退出登录，正在跳转到登录页面...');
-                    // 实际应用中这里应该跳转到登录页面
-                }
-            });
-            
             // 导航激活状态
             const currentPage = '控制台';
             document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -835,6 +781,39 @@
                 }
             });
         });
+        
+        // 编辑食堂
+        function editCanteen(canteenName) {
+            alert(`即将编辑 ${canteenName} 的信息`);
+            // 实际应用中这里会跳转到编辑页面或打开编辑弹窗
+        }
+        
+        // 处理任务
+        function handleTask(taskType) {
+            const taskTitles = {
+                'review': '评论审核',
+                'menu': '菜单更新',
+                'hours': '营业时间调整',
+                'price': '价格异常处理'
+            };
+            alert(`处理任务: ${taskTitles[taskType]}`);
+            // 实际应用中这里会跳转到对应任务处理页面
+        }
+        
+        // 快捷操作
+        function openQuickAction(actionType) {
+            const actionTitles = {
+                'scan': '扫码快速录入',
+                'excel': 'Excel批量导入',
+                'edit': '批量编辑操作',
+                'schedule': '智能排期助手'
+            };
+            alert(`执行操作: ${actionTitles[actionType]}`);
+            // 实际应用中这里会打开对应功能界面
+        }
+        
+
     </script>
+    <script src="./navbar.js"></script>
 </body>
 </html>

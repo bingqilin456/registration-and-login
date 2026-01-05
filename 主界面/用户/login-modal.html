@@ -1,0 +1,27 @@
+<!-- 简易登录弹窗（示例） -->
+<div id="login-modal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeLoginModal()">×</button>
+    <h3>登录</h3>
+    <div style="margin-top:12px;">
+      <button class="btn" onclick="simulateUserLogin()">以普通用户登录（示例）</button>
+    </div>
+    <div style="margin-top:8px;">
+      <button class="btn" onclick="simulateAdminLogin()">以管理员登录（示例）</button>
+    </div>
+  </div>
+</div>
+
+<style>
+#login-modal.modal { position: fixed; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; z-index:20000; }
+#login-modal .modal-content{background:white;padding:20px;border-radius:8px;min-width:280px}
+#login-modal .modal-close{position:absolute;right:10px;top:10px;border:none;background:none;font-size:20px}
+#login-modal .btn{display:block;width:100%;padding:10px;margin-top:6px;border-radius:6px;border:none;background:#e60012;color:#fff}
+.hidden{display:none}
+</style>
+
+<script>
+function closeLoginModal(){ const m = document.getElementById('login-modal'); if(m) m.classList.add('hidden'); }
+function simulateUserLogin(){ try{ localStorage.setItem('userRole','user'); }catch(e){}; window.location.href = '../用户/用户“首页”界面.html'; }
+function simulateAdminLogin(){ try{ localStorage.setItem('userRole','admin'); }catch(e){}; window.location.href = '../管理员/管理员首页.html'; }
+</script>
